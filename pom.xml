@@ -71,7 +71,6 @@
     <dependency>
       <groupId>io.micronaut.flyway</groupId>
       <artifactId>micronaut-flyway</artifactId>
-      <version>7.7.0</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

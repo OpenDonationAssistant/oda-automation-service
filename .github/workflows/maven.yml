@@ -58,7 +58,7 @@ jobs:
       run: mvn -B -q verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=OpenDonationAssistant_oda-automation-service
 
     - name: Build service
-      run: mvn -B -q clean package -Dpackaging=native-image -DskipTests
+      run: mvn -B -q clean package -DskipTests
 
     - run: npm install
       working-directory: "target/generated-sources/openapi/"
