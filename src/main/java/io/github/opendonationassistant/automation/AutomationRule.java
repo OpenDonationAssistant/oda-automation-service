@@ -1,0 +1,124 @@
+package io.github.opendonationassistant.automation;
+
+import io.github.opendonationassistant.automation.dto.AutomationActionDto;
+import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
+import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
+import io.github.opendonationassistant.automation.repository.AutomationRuleData;
+import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
+import io.micronaut.serde.ObjectMapper;
+import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
+
+import java.util.List;
+
+@Serdeable
+@EqualsAndHashCode
+public class AutomationRule {
+
+  private String id;
+  private String name;
+  private String recipientId;
+  private List<AutomationTrigger> triggers;
+  private List<AutomationAction> actions;
+  private AutomationRuleDataRepository repository;
+
+  public AutomationRule(
+    String recipientId,
+    String id,
+    String name,
+    List<AutomationTrigger> triggers,
+    List<AutomationAction> actions,
+    AutomationRuleDataRepository repository
+  ) {
+    this.recipientId = recipientId;
+    this.id = id;
+    this.name = name;
+    this.triggers = triggers;
+    this.actions = actions;
+    this.repository = repository;
+  }
+
+  public void save() {
+    repository.save(
+      new AutomationRuleData(
+        this.getId(),
+        this.getName(),
+        this.getRecipientId(),
+        this.getTriggers().stream().map(AutomationTrigger::asData).toList(),
+        this.getActions().stream().map(AutomationAction::asData).toList()
+      )
+    );
+  }
+
+  public String getId() {
+    return this.id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<AutomationTrigger> getTriggers() {
+    return triggers;
+  }
+
+  public void setTriggers(List<AutomationTrigger> triggers) {
+    this.triggers = triggers;
+  }
+
+  public List<AutomationAction> getActions() {
+    return actions;
+  }
+
+  public void setActions(List<AutomationAction> actions) {
+    this.actions = actions;
+  }
+
+  public AutomationRuleDto asDto() {
+    var dto = new AutomationRuleDto();
+    dto.setId(this.getId());
+    dto.setActions(
+      this.getActions()
+        .stream()
+        .map(action -> new AutomationActionDto(action.getId(), action.getValue()))
+        .toList()
+    );
+    dto.setName(this.getName());
+    dto.setTriggers(
+      this.getTriggers()
+        .stream()
+        .map(trigger ->
+          new AutomationTriggerDto(trigger.getId(), trigger.getValue())
+        )
+        .toList()
+    );
+    return dto;
+  }
+
+  @Override
+  public String toString() {
+    try {
+      return ObjectMapper.getDefault().writeValueAsString(this);
+    } catch (Exception e) {
+      return "Can't serialize as  json";
+    }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+      return AutomationRuleObject.equals(this, o);
+  }
+
+  @Override
+  public int hashCode() {
+      return AutomationRuleObject.hashCode(this);
+  }
+
+  public String getRecipientId() {
+    return recipientId;
+  }
+}
