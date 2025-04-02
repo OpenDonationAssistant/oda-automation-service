@@ -8,8 +8,12 @@ import io.github.opendonationassistant.events.widget.WidgetUpdateCommand;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RefreshDonationGoalAction extends AutomationAction {
+
+  private Logger log = LoggerFactory.getLogger(RefreshDonationGoalAction.class);
 
   private WidgetsApi widgets;
   private String widgetId;
@@ -28,11 +32,13 @@ public class RefreshDonationGoalAction extends AutomationAction {
   }
 
   public void execute() {
+    log.debug("Checking RefreshDonationGoalAction");
     getWidgetId()
       .map(widgets::getWidget)
       .ifPresent(widget -> {
         widget
           .thenAccept(it -> {
+            log.debug("Updating goal");
             final Map<String, Object> config = it.getConfig();
             var goals = new WidgetProperty();
             goals.setName("goal");
