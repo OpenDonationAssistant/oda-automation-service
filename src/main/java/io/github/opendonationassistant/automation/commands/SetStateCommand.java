@@ -15,9 +15,13 @@ import io.github.opendonationassistant.automation.repository.AutomationVariableR
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Serdeable
 public class SetStateCommand {
+
+  private Logger log = LoggerFactory.getLogger(SetStateCommand.class);
 
   private List<AutomationRuleDto> rules;
   private List<AutomationVariableDto> variables;
@@ -64,9 +68,11 @@ public class SetStateCommand {
     rules.forEach(rule -> {
       final Optional<AutomationRule> existing =
         rulesRepository.getByRecipientIdAndRuleId(recipientId, rule.getId());
+      log.info("checking existing rule: {}", existing.get());
       existing.ifPresentOrElse(
         it -> it.save(),
         () -> {
+          log.info("create new rule: {}", rule.getId());
           rulesRepository.create(
             recipientId,
             rule.getId(),
