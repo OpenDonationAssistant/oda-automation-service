@@ -12,14 +12,16 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RefreshDonationGoalAction extends AutomationAction {
+public class IncreaseDonationGoalAction extends AutomationAction {
 
-  private Logger log = LoggerFactory.getLogger(RefreshDonationGoalAction.class);
+  private Logger log = LoggerFactory.getLogger(
+    IncreaseDonationGoalAction.class
+  );
 
   private WidgetsApi widgets;
   private WidgetCommandSender widgetCommandSender;
 
-  public RefreshDonationGoalAction(
+  public IncreaseDonationGoalAction(
     String id,
     Map<String, Object> value,
     WidgetsApi widgets,
@@ -28,6 +30,10 @@ public class RefreshDonationGoalAction extends AutomationAction {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
+  }
+
+  public Optional<Integer> getIncreaseAmount() {
+    return Optional.ofNullable((Integer) this.getValue().get("amount"));
   }
 
   public Optional<String> getWidgetId() {
@@ -39,23 +45,41 @@ public class RefreshDonationGoalAction extends AutomationAction {
   }
 
   public void execute() {
-    log.info("Checking RefreshDonationGoalAction");
+    log.info("Checking IncreaseDonationGoalAction");
     getWidgetId()
       .map(widgets::getWidget)
       .ifPresent(widget -> {
         widget
           .thenAccept(it -> {
-            log.info("Updating goal in widget {}", it.getId());
+            log.info("Updating amount in goal in widget {}", it.getId());
             final Map<String, Object> config = it.getConfig();
             var goals = new WidgetProperty();
             goals.setName("goal");
             goals.setValue(
               ((List<Map<String, Object>>) config.get("goal")).stream()
                 .map(goal -> {
-                  if (goalId.equals(goal.get("id"))) {
+                  if (
+                    getGoalId()
+                      .filter(id -> id.equals(goal.get("id")))
+                      .isPresent()
+                  ) {
+                    final Map<String, Object> required =
+                      ((Map<String, Object>) goal.getOrDefault(
+                          "requiredAmount",
+                          Map.of()
+                        ));
+                    Integer totalAmount = (Integer) required.getOrDefault(
+                      "major",
+                      0
+                    );
                     goal.put(
-                      "accumulatedAmount",
-                      Map.of("major", 0, "currency", "RUB")
+                      "requiredAmount",
+                      Map.of(
+                        "major",
+                        totalAmount + getIncreaseAmount().orElse(0),
+                        "currency",
+                        "RUB"
+                      )
                     );
                   }
                   return goal;
