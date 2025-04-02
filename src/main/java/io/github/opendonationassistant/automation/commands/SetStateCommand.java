@@ -68,7 +68,10 @@ public class SetStateCommand {
     rules.forEach(rule -> {
       final Optional<AutomationRule> existing =
         rulesRepository.getByRecipientIdAndRuleId(recipientId, rule.getId());
-      log.info("checking existing rule: {}", existing.get());
+      log.info("checking existing rule: {}", rule.getId());
+      if (existing.isPresent()){
+        log.info("found: {}", existing.get());
+      }
       existing.ifPresentOrElse(
         it -> it.save(),
         () -> {
