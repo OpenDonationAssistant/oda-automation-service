@@ -10,7 +10,9 @@ import io.github.opendonationassistant.automation.dto.AutomationStringVariableDt
 import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData;
+import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
+import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.List;
@@ -37,13 +39,17 @@ public class SetStateCommand {
   public void execute(
     AutomationVariableRepository variablesRepository,
     AutomationRuleRepository rulesRepository,
+    AutomationRuleDataRepository dataRepository,
+    AutomationVariableDataRepository variableDataRepository,
     String recipientId
   ) {
     variables.forEach(variable -> {
       final Optional<AutomationVariable<?>> existing =
         variablesRepository.getById(recipientId, variable.getId());
       existing.ifPresentOrElse(
-        it -> it.save(),
+        it -> {
+          variable.asDomain(recipientId, variableDataRepository).save();
+        },
         () -> {
           switch (variable) {
             case AutomationNumberVariableDto it -> variablesRepository.create(
@@ -69,7 +75,9 @@ public class SetStateCommand {
       final Optional<AutomationRule> existing =
         rulesRepository.getByRecipientIdAndRuleId(recipientId, rule.getId());
       existing.ifPresentOrElse(
-        it -> it.save(),
+        it -> {
+          rule.asDomain(recipientId, dataRepository).save();
+        },
         () -> {
           rulesRepository.create(
             recipientId,

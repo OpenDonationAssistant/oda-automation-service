@@ -1,5 +1,7 @@
 package io.github.opendonationassistant.automation.dto;
 
+import io.github.opendonationassistant.automation.AutomationRule;
+import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
@@ -44,6 +46,20 @@ public class AutomationRuleDto {
 
   public void setActions(List<AutomationActionDto> actions) {
     this.actions = actions;
+  }
+
+  public AutomationRule asDomain(
+    String recipientId,
+    AutomationRuleDataRepository repository
+  ) {
+    return new AutomationRule(
+      recipientId,
+      id,
+      name,
+      triggers.stream().map(AutomationTriggerDto::asDomain).toList(),
+      actions.stream().map(AutomationActionDto::asDomain).toList(),
+      repository
+    );
   }
 
   @Override

@@ -1,6 +1,8 @@
 package io.github.opendonationassistant.automation.commands;
 
+import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
+import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
@@ -17,14 +19,20 @@ public class AutomationCommandController {
 
   private AutomationVariableRepository variables;
   private AutomationRuleRepository rules;
+  private AutomationRuleDataRepository ruleDataRepository;
+  private AutomationVariableDataRepository variableDataRepository;
 
   @Inject
   public AutomationCommandController(
     AutomationVariableRepository variables,
-    AutomationRuleRepository rules
+    AutomationRuleRepository rules,
+    AutomationRuleDataRepository ruleDataRepository,
+    AutomationVariableDataRepository variableDataRepository
   ) {
     this.variables = variables;
     this.rules = rules;
+    this.variableDataRepository = variableDataRepository;
+    this.ruleDataRepository = ruleDataRepository;
   }
 
   @Post("/automation/commands/setstate")
@@ -37,7 +45,13 @@ public class AutomationCommandController {
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
-    command.execute(variables, rules, ownerId.get());
+    command.execute(
+      variables,
+      rules,
+      ruleDataRepository,
+      variableDataRepository,
+      ownerId.get()
+    );
     return HttpResponse.ok();
   }
 

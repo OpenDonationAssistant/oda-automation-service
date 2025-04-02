@@ -1,11 +1,11 @@
 package io.github.opendonationassistant.automation;
 
+import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData.AutomationTriggerData;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
-
 import java.util.Map;
 
 @Serdeable
@@ -40,6 +40,10 @@ public class AutomationTrigger {
     return new AutomationTriggerData(this.getId(), this.getValue());
   }
 
+  public AutomationTriggerDto asDto() {
+    return new AutomationTriggerDto(this.getId(), this.getValue());
+  }
+
   @Override
   public String toString() {
     try {
@@ -58,5 +62,4 @@ public class AutomationTrigger {
   public int hashCode() {
     return AutomationTriggerObject.hashCode(this);
   }
-
 }

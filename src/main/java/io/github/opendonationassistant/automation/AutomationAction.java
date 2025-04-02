@@ -1,11 +1,11 @@
 package io.github.opendonationassistant.automation;
 
-import java.util.Map;
-
+import io.github.opendonationassistant.automation.dto.AutomationActionDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData.AutomationActionData;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
+import java.util.Map;
 
 @Serdeable
 @EqualsAndHashCode
@@ -19,11 +19,16 @@ public class AutomationAction {
     this.value = value;
   }
 
-  public AutomationActionData asData(){
+  public AutomationActionData asData() {
     return new AutomationActionData(this.getId(), this.getValue());
   }
 
-  public void execute() {}
+  public AutomationActionDto asDto() {
+    return new AutomationActionDto(this.id, this.value);
+  }
+
+  public void execute() {
+  }
 
   public String getId() {
     return id;
@@ -55,5 +60,4 @@ public class AutomationAction {
   public int hashCode() {
     return AutomationActionObject.hashCode(this);
   }
-
 }
