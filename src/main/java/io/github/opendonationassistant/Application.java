@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.info.License;
 @OpenAPIDefinition(
   info = @Info(
     title = "ODA Automation Service",
-    version = "0.1",
+    version = "0.2",
     description = "ODA Automation Service",
     license = @License(
       name = "GPL-3.0",

@@ -11,11 +11,15 @@ import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
 
 @Serdeable
-@JsonTypeInfo(use = Id.NAME)
+@JsonTypeInfo(
+  use = Id.NAME,
+  include = JsonTypeInfo.As.PROPERTY,
+  property = "type"
+)
 @JsonSubTypes(
   {
-    @Type(AutomationStringVariableDto.class),
-    @Type(AutomationNumberVariableDto.class),
+    @Type(value = AutomationStringVariableDto.class, name = "string"),
+    @Type(value = AutomationNumberVariableDto.class, name = "number"),
   }
 )
 @EqualsAndHashCode
