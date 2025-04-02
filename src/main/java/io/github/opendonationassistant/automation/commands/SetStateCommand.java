@@ -4,9 +4,7 @@ import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.dto.AutomationActionDto;
 import io.github.opendonationassistant.automation.dto.AutomationDto;
-import io.github.opendonationassistant.automation.dto.AutomationNumberVariableDto;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
-import io.github.opendonationassistant.automation.dto.AutomationStringVariableDto;
 import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData;
@@ -51,20 +49,20 @@ public class SetStateCommand {
           variable.asDomain(recipientId, variableDataRepository).save();
         },
         () -> {
-          switch (variable) {
-            case AutomationNumberVariableDto it -> variablesRepository.create(
-              recipientId,
-              "number",
-              it.getId(),
-              it.getName(),
-              String.valueOf(it.getValue())
-            );
-            case AutomationStringVariableDto it -> variablesRepository.create(
+          switch (variable.getType()) {
+            case "string" -> variablesRepository.create(
               recipientId,
               "string",
-              it.getId(),
-              it.getName(),
-              it.getValue()
+              variable.getId(),
+              variable.getName(),
+              variable.getValue()
+            );
+            case "number" -> variablesRepository.create(
+              recipientId,
+              "number",
+              variable.getId(),
+              variable.getName(),
+              variable.getValue()
             );
             default -> {}
           }

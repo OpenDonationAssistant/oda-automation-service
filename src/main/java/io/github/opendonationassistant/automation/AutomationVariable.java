@@ -55,20 +55,12 @@ public class AutomationVariable<T> {
   }
 
   public AutomationVariableDto asDto() {
-    return new AutomationVariableDto(this.getId(), this.getName()) {
-      @Override
-      public AutomationVariable<?> asDomain(
-        String recipientId,
-        AutomationVariableDataRepository repository
-      ) {
-        return new AutomationVariable<>(
-          recipientId,
-          this.getId(),
-          this.getName(),
-          repository
-        );
-      }
-    };
+    return new AutomationVariableDto(
+      this.id,
+      this.name,
+      "string",
+      String.valueOf(this.value)
+    );
   }
 
   @Override

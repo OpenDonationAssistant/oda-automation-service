@@ -1,36 +1,33 @@
 package io.github.opendonationassistant.automation.dto;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import io.github.opendonationassistant.automation.AutomationVariable;
+import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
+import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
+import java.math.BigDecimal;
 
 @Serdeable
-@JsonTypeInfo(
-  use = Id.NAME,
-  include = JsonTypeInfo.As.PROPERTY,
-  property = "type"
-)
-@JsonSubTypes(
-  {
-    @Type(value = AutomationStringVariableDto.class, name = "string"),
-    @Type(value = AutomationNumberVariableDto.class, name = "number"),
-  }
-)
 @EqualsAndHashCode
-public abstract class AutomationVariableDto {
+public class AutomationVariableDto {
 
   private String id;
   private String name;
+  private String type;
+  private String value;
 
-  public AutomationVariableDto(String id, String name) {
+  public AutomationVariableDto(
+    String id,
+    String name,
+    String type,
+    String value
+  ) {
     this.id = id;
     this.name = name;
+    this.type = type;
+    this.value = value;
   }
 
   public String getId() {
@@ -45,10 +42,27 @@ public abstract class AutomationVariableDto {
     this.name = name;
   }
 
-  public abstract AutomationVariable<?> asDomain(
+  public AutomationVariable<?> asDomain(
     String recipientId,
     AutomationVariableDataRepository repository
-  );
+  ) {
+    if ("number".equals(type)) {
+      return new AutomationNumberVariable(
+        recipientId,
+        id,
+        name,
+        new BigDecimal(value),
+        repository
+      );
+    }
+    return new AutomationStringVariable(
+      recipientId,
+      id,
+      name,
+      value,
+      repository
+    );
+  }
 
   @Override
   public String toString() {
@@ -67,5 +81,17 @@ public abstract class AutomationVariableDto {
   @Override
   public int hashCode() {
     return AutomationVariableDtoObject.hashCode(this);
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type){
+    this.type = type;
+  }
+
+  public String getValue() {
+    return value;
   }
 }

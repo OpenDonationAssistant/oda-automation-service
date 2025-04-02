@@ -1,7 +1,6 @@
 package io.github.opendonationassistant.automation.domain.variable;
 
 import io.github.opendonationassistant.automation.AutomationVariable;
-import io.github.opendonationassistant.automation.dto.AutomationStringVariableDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationVariableData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
@@ -34,9 +33,10 @@ public class AutomationStringVariable extends AutomationVariable<String> {
   }
 
   public AutomationVariableDto asDto() {
-    return new AutomationStringVariableDto(
+    return new AutomationVariableDto(
       this.getId(),
       this.getName(),
+      "string",
       this.getValue()
     );
   }

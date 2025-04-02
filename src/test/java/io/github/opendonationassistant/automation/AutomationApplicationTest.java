@@ -8,7 +8,6 @@ import io.github.opendonationassistant.automation.commands.AutomationCommandCont
 import io.github.opendonationassistant.automation.commands.SetStateCommand;
 import io.github.opendonationassistant.automation.dto.AutomationDto;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
-import io.github.opendonationassistant.automation.dto.AutomationStringVariableDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.view.AutomationController;
 import io.micronaut.core.annotation.NonNull;
@@ -40,7 +39,6 @@ public class AutomationApplicationTest {
 
   @WithSettings
   private final Settings settings = Settings.create()
-    .mapType(AutomationVariableDto.class, AutomationStringVariableDto.class)
     .mapType(Object.class, String.class);
 
   @Test
@@ -54,6 +52,7 @@ public class AutomationApplicationTest {
       Map.of("preferred_username", recipientId)
     );
 
+    variable.setType("string");
     var command = new SetStateCommand(List.of(rule), List.of(variable));
 
     commandController.setState(auth, command);
