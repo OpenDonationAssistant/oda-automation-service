@@ -39,7 +39,7 @@ public class AutomationRule {
   }
 
   public void save() {
-    repository.save(
+    repository.update(
       new AutomationRuleData(
         this.getId(),
         this.getName(),
