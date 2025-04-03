@@ -52,11 +52,6 @@ public class RefreshDonationGoalAction extends AutomationAction {
 
   public void execute() {
     log.info("Checking RefreshDonationGoalAction");
-    try {
-      Thread.sleep(2000);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
     getGoalId()
       .ifPresent(goalId ->
         getWidgetId()
@@ -104,18 +99,6 @@ public class RefreshDonationGoalAction extends AutomationAction {
                         "accumulatedAmount",
                         Map.of("major", diff > 0 ? diff : 0, "currency", "RUB")
                       );
-                      var updatedGoal = new UpdatedGoal();
-                      updatedGoal.setGoalId(goalId);
-                      updatedGoal.setRecipientId(
-                        (String) goal.getOrDefault("recipientId", "")
-                      );
-                      updatedGoal.setRequiredAmount(
-                        new Amount(requiredAmount, 0, "RUB")
-                      );
-                      updatedGoal.setAccumulatedAmount(
-                        new Amount(diff > 0 ? diff : 0, 0, "RUB")
-                      );
-                      goalSender.sendUpdatedGoal(updatedGoal);
                     }
                     return goal;
                   })
