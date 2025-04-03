@@ -5,6 +5,7 @@ import static io.micronaut.http.HttpHeaders.CONTENT_TYPE;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Header;
 import io.micronaut.http.annotation.PathVariable;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.annotation.Client;
 import java.util.concurrent.CompletableFuture;
 

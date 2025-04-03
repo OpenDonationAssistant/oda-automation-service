@@ -45,7 +45,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
   }
 
   public void execute() {
-    log.info("Checking IncreaseDonationGoalAction");
+    log.info("Checking IncreaseDonationGoalAction: {}", getWidgetId());
     getWidgetId()
       .map(widgets::getWidget)
       .ifPresent(widget -> {

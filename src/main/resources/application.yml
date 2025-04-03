@@ -10,6 +10,7 @@ micronaut:
           jwks:
             keycloak:
               url: https://auth.oda.digital/realms/ODA/protocol/openid-connect/certs
+  http.services.widgets.url: http://widgets-service
 flyway:
   datasources:
     default:
