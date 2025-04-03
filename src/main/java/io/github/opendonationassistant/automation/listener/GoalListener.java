@@ -66,6 +66,7 @@ public class GoalListener {
                 action.getValue()
               )
             )
+            .toList()
             .forEach(AutomationAction::execute);
           goalSender.sendUpdatedGoal(goal);
         })
