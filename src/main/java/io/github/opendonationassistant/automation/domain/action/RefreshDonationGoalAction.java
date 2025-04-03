@@ -54,18 +54,26 @@ public class RefreshDonationGoalAction extends AutomationAction {
               .thenAccept(it -> {
                 log.info("Updating goal in widget {}", it.getId());
                 final Map<String, Object> config = it.getConfig();
-                final List<Map<String, Object>> updatedGoals =
-                  ((List<Map<String, Object>>) config.get("goal")).stream()
-                    .map(goal -> {
-                      if (goalId.equals(goal.get("id"))) {
-                        goal.put(
-                          "accumulatedAmount",
-                          Map.of("major", 0, "currency", "RUB")
-                        );
-                      }
-                      return goal;
-                    })
-                    .toList();
+                log.info("existing config: {}", config);
+                final Stream<Map<String, Object>> existingGoals =
+                  ((List<Map<String, Object>>) config.get(
+                      "properties"
+                    )).stream()
+                    .filter(prop -> "goal".equals(prop.get("name")))
+                    .flatMap(goal ->
+                      ((List<Map<String, Object>>) goal.get("value")).stream()
+                    );
+                final List<Map<String, Object>> updatedGoals = existingGoals
+                  .map(goal -> {
+                    if (goalId.equals(goal.get("id"))) {
+                      goal.put(
+                        "accumulatedAmount",
+                        Map.of("major", 0, "currency", "RUB")
+                      );
+                    }
+                    return goal;
+                  })
+                  .toList();
                 var goals = new WidgetProperty();
                 goals.setName("goal");
                 goals.setValue(updatedGoals);
@@ -82,7 +90,6 @@ public class RefreshDonationGoalAction extends AutomationAction {
                 command.setValue(updatedGoals);
                 command.setOwnerId(it.getOwnerId());
                 command.setName("paymentpage");
-                configCommandSender.send(command);
               })
               .join(); // TODO: join?
           })
