@@ -112,7 +112,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
             command.setOwnerId(it.getOwnerId());
             command.setName("paymentpage");
             log.info("config patch: {}", updatedGoals);
-            configCommandSender.send(command);
+            //configCommandSender.send(command);
           })
           .join(); // TODO: join?
       });
