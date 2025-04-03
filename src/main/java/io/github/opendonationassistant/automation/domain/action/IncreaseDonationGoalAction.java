@@ -97,6 +97,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
             var goals = new WidgetProperty();
             goals.setName("goal");
             goals.setValue(updatedGoals);
+            log.info("widget patch: {}", updatedGoals);
 
             var patch = new WidgetConfig();
             patch.setProperties(List.of(goals));
@@ -109,6 +110,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
             command.setValue(updatedGoals);
             command.setOwnerId(it.getOwnerId());
             command.setName("paymentpage");
+            log.info("config patch: {}", updatedGoals);
             configCommandSender.send(command);
           })
           .join(); // TODO: join?
