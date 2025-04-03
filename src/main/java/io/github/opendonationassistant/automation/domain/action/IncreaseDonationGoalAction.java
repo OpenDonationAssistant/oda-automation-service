@@ -1,6 +1,7 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
+import io.github.opendonationassistant.automation.api.Widget;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.events.config.ConfigCommandSender;
 import io.github.opendonationassistant.events.config.ConfigPutCommand;
@@ -25,6 +26,8 @@ public class IncreaseDonationGoalAction extends AutomationAction {
   private WidgetCommandSender widgetCommandSender;
   private ConfigCommandSender configCommandSender;
 
+  private final Optional<Widget> widget;
+
   public IncreaseDonationGoalAction(
     String id,
     Map<String, Object> value,
@@ -36,6 +39,8 @@ public class IncreaseDonationGoalAction extends AutomationAction {
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
     this.configCommandSender = configCommandSender;
+    this.widget = getWidgetId()
+      .map(widgetId -> widgets.getWidget(widgetId).join());
   }
 
   public Optional<Integer> getIncreaseAmount() {
@@ -52,72 +57,57 @@ public class IncreaseDonationGoalAction extends AutomationAction {
 
   public void execute() {
     log.info("Checking IncreaseDonationGoalAction: {}", getWidgetId());
-    getWidgetId()
-      .map(widgets::getWidget)
-      .ifPresent(widget -> {
-        widget
-          .thenAccept(it -> {
-            log.info("Updating amount in goal in widget {}", it.getId());
-            final Map<String, Object> config = it.getConfig();
-            final Stream<Map<String, Object>> existingGoals =
-              ((List<Map<String, Object>>) config.get("properties")).stream()
-                .filter(prop -> "goal".equals(prop.get("name")))
-                .flatMap(goal ->
-                  ((List<Map<String, Object>>) goal.get("value")).stream()
-                );
-            final List<Map<String, Object>> updatedGoals = existingGoals
-              .map(goal -> {
-                if (
-                  getGoalId()
-                    .filter(id -> id.equals(goal.get("id")))
-                    .isPresent()
-                ) {
-                  final Map<String, Object> required =
-                    ((Map<String, Object>) goal.getOrDefault(
-                        "requiredAmount",
-                        Map.of()
-                      ));
-                  Integer totalAmount = (Integer) required.getOrDefault(
-                    "major",
-                    0
-                  );
-                  log.info(
-                    "changing required amount, previous: {}, addition: {}",
-                    totalAmount,
-                    getIncreaseAmount().orElse(0)
-                  );
-                  goal.put(
-                    "requiredAmount",
-                    Map.of(
-                      "major",
-                      totalAmount + getIncreaseAmount().orElse(0),
-                      "currency",
-                      "RUB"
-                    )
-                  );
-                }
-                return goal;
-              })
-              .toList();
-            var goals = new WidgetProperty();
-            goals.setName("goal");
-            goals.setValue(updatedGoals);
-            log.info("widget patch: {}", updatedGoals);
-
-            var patch = new WidgetConfig();
-            patch.setProperties(List.of(goals));
-            widgetCommandSender.send(
-              new WidgetUpdateCommand(it.getId(), patch)
+    widget.ifPresent(it -> {
+      log.info("Updating amount in goal in widget {}", it.getId());
+      final Map<String, Object> config = it.getConfig();
+      final Stream<Map<String, Object>> existingGoals =
+        ((List<Map<String, Object>>) config.get("properties")).stream()
+          .filter(prop -> "goal".equals(prop.get("name")))
+          .flatMap(goal ->
+            ((List<Map<String, Object>>) goal.get("value")).stream()
+          );
+      final List<Map<String, Object>> updatedGoals = existingGoals
+        .map(goal -> {
+          if (getGoalId().filter(id -> id.equals(goal.get("id"))).isPresent()) {
+            final Map<String, Object> required =
+              ((Map<String, Object>) goal.getOrDefault(
+                  "requiredAmount",
+                  Map.of()
+                ));
+            Integer totalAmount = (Integer) required.getOrDefault("major", 0);
+            log.info(
+              "changing required amount, previous: {}, addition: {}",
+              totalAmount,
+              getIncreaseAmount().orElse(0)
             );
+            goal.put(
+              "requiredAmount",
+              Map.of(
+                "major",
+                totalAmount + getIncreaseAmount().orElse(0),
+                "currency",
+                "RUB"
+              )
+            );
+          }
+          return goal;
+        })
+        .toList();
+      var goals = new WidgetProperty();
+      goals.setName("goal");
+      goals.setValue(updatedGoals);
+      log.info("widget patch: {}", updatedGoals);
 
-            var command = new ConfigPutCommand();
-            command.setKey("goals");
-            command.setValue(updatedGoals);
-            command.setOwnerId(it.getOwnerId());
-            command.setName("paymentpage");
-            log.info("config patch: {}", updatedGoals);
-          })
-          .join(); // TODO: join?
-      });
+      var patch = new WidgetConfig();
+      patch.setProperties(List.of(goals));
+      widgetCommandSender.send(new WidgetUpdateCommand(it.getId(), patch));
+
+      var command = new ConfigPutCommand();
+      command.setKey("goals");
+      command.setValue(updatedGoals);
+      command.setOwnerId(it.getOwnerId());
+      command.setName("paymentpage");
+      log.info("config patch: {}", updatedGoals);
+    });
   }
 }

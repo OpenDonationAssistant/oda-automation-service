@@ -1,5 +1,6 @@
 package io.github.opendonationassistant.automation.listener;
 
+import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
@@ -10,7 +11,6 @@ import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
-
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +58,15 @@ public class GoalListener {
         .ifPresent(trigger -> {
           rule
             .getActions()
-            .forEach(action ->
-              actionFactory.create(goal.getRecipientId(), action.getId(), action.getValue()).execute()
-            );
+            .stream()
+            .map(action ->
+              actionFactory.create(
+                goal.getRecipientId(),
+                action.getId(),
+                action.getValue()
+              )
+            )
+            .forEach(AutomationAction::execute);
           goalSender.sendUpdatedGoal(goal);
         })
     );
