@@ -2,6 +2,8 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
+import io.github.opendonationassistant.events.config.ConfigCommandSender;
+import io.github.opendonationassistant.events.config.ConfigPutCommand;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import io.github.opendonationassistant.events.widget.WidgetConfig;
 import io.github.opendonationassistant.events.widget.WidgetProperty;
@@ -18,16 +20,19 @@ public class RefreshDonationGoalAction extends AutomationAction {
 
   private WidgetsApi widgets;
   private WidgetCommandSender widgetCommandSender;
+  private ConfigCommandSender configCommandSender;
 
   public RefreshDonationGoalAction(
     String id,
     Map<String, Object> value,
     WidgetsApi widgets,
-    WidgetCommandSender widgetCommandSender
+    WidgetCommandSender widgetCommandSender,
+    ConfigCommandSender configCommandSender
   ) {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
+    this.configCommandSender = configCommandSender;
   }
 
   public Optional<String> getWidgetId() {
@@ -49,9 +54,7 @@ public class RefreshDonationGoalAction extends AutomationAction {
               .thenAccept(it -> {
                 log.info("Updating goal in widget {}", it.getId());
                 final Map<String, Object> config = it.getConfig();
-                var goals = new WidgetProperty();
-                goals.setName("goal");
-                goals.setValue(
+                final List<Map<String, Object>> updatedGoals =
                   ((List<Map<String, Object>>) config.get("goal")).stream()
                     .map(goal -> {
                       if (goalId.equals(goal.get("id"))) {
@@ -62,14 +65,24 @@ public class RefreshDonationGoalAction extends AutomationAction {
                       }
                       return goal;
                     })
-                    .toList()
-                );
+                    .toList();
+                var goals = new WidgetProperty();
+                goals.setName("goal");
+                goals.setValue(updatedGoals);
 
                 var patch = new WidgetConfig();
                 patch.setProperties(List.of(goals));
                 widgetCommandSender.send(
                   new WidgetUpdateCommand(it.getId(), patch)
                 );
+
+                // TODO: make one flow
+                var command = new ConfigPutCommand();
+                command.setKey("goals");
+                command.setValue(updatedGoals);
+                command.setOwnerId(it.getOwnerId());
+                command.setName("paymentpage");
+                configCommandSender.send(command);
               })
               .join(); // TODO: join?
           })
