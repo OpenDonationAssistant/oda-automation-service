@@ -59,6 +59,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
           .thenAccept(it -> {
             log.info("Updating amount in goal in widget {}", it.getId());
             final Map<String, Object> config = it.getConfig();
+            log.info("existing config: {}", config);
             final Stream<Map<String, Object>> existingGoals =
               ((List<Map<String, Object>>) config.get("properties")).stream()
                 .filter(prop -> "goal".equals(prop.get("name")))
