@@ -9,6 +9,7 @@ import io.github.opendonationassistant.events.widget.WidgetUpdateCommand;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +54,16 @@ public class IncreaseDonationGoalAction extends AutomationAction {
           .thenAccept(it -> {
             log.info("Updating amount in goal in widget {}", it.getId());
             final Map<String, Object> config = it.getConfig();
+            final Stream<Map<String, Object>> existingGoals =
+              ((List<Map<String, Object>>) config.get("properties")).stream()
+                .filter(prop -> "goal".equals(prop.get("name")))
+                .flatMap(goal ->
+                  ((List<Map<String, Object>>) goal.get("value")).stream()
+                );
             var goals = new WidgetProperty();
             goals.setName("goal");
             goals.setValue(
-              ((List<Map<String, Object>>) config.get("goal")).stream()
+              existingGoals
                 .map(goal -> {
                   if (
                     getGoalId()
