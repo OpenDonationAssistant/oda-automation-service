@@ -36,10 +36,12 @@ public class IncreaseVariableAction extends AutomationAction {
       .flatMap(id -> variables.getById(recipientId, id))
       .filter(variable -> variable instanceof AutomationNumberVariable)
       .map(variable -> (AutomationNumberVariable) variable)
-      .ifPresent(variable ->
+      .ifPresent(variable ->{
         variable.setValue(
           variable.getValue().add(new BigDecimal(getAmount().orElse(0)))
-        )
+        );
+        variable.save();
+      }
       );
   }
 }
