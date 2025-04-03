@@ -35,6 +35,11 @@ public class GoalListener {
 
   @Queue(io.github.opendonationassistant.rabbit.Queue.Events.GOAL)
   public void checkAutomationForUpdatedGoals(UpdatedGoal goal) {
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
       goal.getRecipientId()
     );
