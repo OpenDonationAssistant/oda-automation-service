@@ -83,7 +83,7 @@ public class RefreshDonationGoalAction extends AutomationAction {
                           ));
                       Integer collectedAmount =
                         (Integer) collected.getOrDefault("major", 0);
-                      int diff = requiredAmount - collectedAmount;
+                      int diff = collectedAmount - requiredAmount;
                       goal.put(
                         "accumulatedAmount",
                         Map.of("major", diff > 0 ? diff : 0, "currency", "RUB")
