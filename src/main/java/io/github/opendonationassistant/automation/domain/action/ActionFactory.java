@@ -40,7 +40,8 @@ public class ActionFactory {
         id,
         value,
         widgets,
-        widgetCommandSender
+        widgetCommandSender,
+        configCommandSender
       );
       case "refresh-donation-goal" -> new RefreshDonationGoalAction(
         id,
