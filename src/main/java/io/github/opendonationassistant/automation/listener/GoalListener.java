@@ -51,7 +51,7 @@ public class GoalListener {
           rule
             .getActions()
             .forEach(action ->
-              actionFactory.create(action.getId(), action.getValue()).execute()
+              actionFactory.create(goal.getRecipientId(), action.getId(), action.getValue()).execute()
             );
         })
     );

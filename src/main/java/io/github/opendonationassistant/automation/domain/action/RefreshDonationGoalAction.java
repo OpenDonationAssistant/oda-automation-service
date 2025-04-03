@@ -40,36 +40,39 @@ public class RefreshDonationGoalAction extends AutomationAction {
 
   public void execute() {
     log.info("Checking RefreshDonationGoalAction");
-    getWidgetId()
-      .map(widgets::getWidget)
-      .ifPresent(widget -> {
-        widget
-          .thenAccept(it -> {
-            log.info("Updating goal in widget {}", it.getId());
-            final Map<String, Object> config = it.getConfig();
-            var goals = new WidgetProperty();
-            goals.setName("goal");
-            goals.setValue(
-              ((List<Map<String, Object>>) config.get("goal")).stream()
-                .map(goal -> {
-                  if (goalId.equals(goal.get("id"))) {
-                    goal.put(
-                      "accumulatedAmount",
-                      Map.of("major", 0, "currency", "RUB")
-                    );
-                  }
-                  return goal;
-                })
-                .toList()
-            );
+    getGoalId()
+      .ifPresent(goalId ->
+        getWidgetId()
+          .map(widgets::getWidget)
+          .ifPresent(widget -> {
+            widget
+              .thenAccept(it -> {
+                log.info("Updating goal in widget {}", it.getId());
+                final Map<String, Object> config = it.getConfig();
+                var goals = new WidgetProperty();
+                goals.setName("goal");
+                goals.setValue(
+                  ((List<Map<String, Object>>) config.get("goal")).stream()
+                    .map(goal -> {
+                      if (goalId.equals(goal.get("id"))) {
+                        goal.put(
+                          "accumulatedAmount",
+                          Map.of("major", 0, "currency", "RUB")
+                        );
+                      }
+                      return goal;
+                    })
+                    .toList()
+                );
 
-            var patch = new WidgetConfig();
-            patch.setProperties(List.of(goals));
-            widgetCommandSender.send(
-              new WidgetUpdateCommand(it.getId(), patch)
-            );
+                var patch = new WidgetConfig();
+                patch.setProperties(List.of(goals));
+                widgetCommandSender.send(
+                  new WidgetUpdateCommand(it.getId(), patch)
+                );
+              })
+              .join(); // TODO: join?
           })
-          .join(); // TODO: join?
-      });
+      );
   }
 }
