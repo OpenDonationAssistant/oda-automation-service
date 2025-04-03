@@ -61,6 +61,7 @@ public class GoalListener {
             .forEach(action ->
               actionFactory.create(goal.getRecipientId(), action.getId(), action.getValue()).execute()
             );
+          goalSender.sendUpdatedGoal(goal);
         })
     );
   }
