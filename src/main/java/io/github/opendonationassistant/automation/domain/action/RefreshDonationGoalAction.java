@@ -2,8 +2,11 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
+import io.github.opendonationassistant.commons.Amount;
 import io.github.opendonationassistant.events.config.ConfigCommandSender;
 import io.github.opendonationassistant.events.config.ConfigPutCommand;
+import io.github.opendonationassistant.events.goal.GoalSender;
+import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import io.github.opendonationassistant.events.widget.WidgetConfig;
 import io.github.opendonationassistant.events.widget.WidgetProperty;
@@ -22,18 +25,21 @@ public class RefreshDonationGoalAction extends AutomationAction {
   private WidgetsApi widgets;
   private WidgetCommandSender widgetCommandSender;
   private ConfigCommandSender configCommandSender;
+  private GoalSender goalSender;
 
   public RefreshDonationGoalAction(
     String id,
     Map<String, Object> value,
     WidgetsApi widgets,
     WidgetCommandSender widgetCommandSender,
-    ConfigCommandSender configCommandSender
+    ConfigCommandSender configCommandSender,
+    GoalSender goalSender
   ) {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
     this.configCommandSender = configCommandSender;
+    this.goalSender = goalSender;
   }
 
   public Optional<String> getWidgetId() {
@@ -46,6 +52,11 @@ public class RefreshDonationGoalAction extends AutomationAction {
 
   public void execute() {
     log.info("Checking RefreshDonationGoalAction");
+    try {
+      Thread.sleep(2000);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     getGoalId()
       .ifPresent(goalId ->
         getWidgetId()
@@ -93,6 +104,18 @@ public class RefreshDonationGoalAction extends AutomationAction {
                         "accumulatedAmount",
                         Map.of("major", diff > 0 ? diff : 0, "currency", "RUB")
                       );
+                      var updatedGoal = new UpdatedGoal();
+                      updatedGoal.setGoalId(goalId);
+                      updatedGoal.setRecipientId(
+                        (String) goal.getOrDefault("recipientId", "")
+                      );
+                      updatedGoal.setRequiredAmount(
+                        new Amount(requiredAmount, 0, "RUB")
+                      );
+                      updatedGoal.setAccumulatedAmount(
+                        new Amount(diff > 0 ? diff : 0, 0, "RUB")
+                      );
+                      goalSender.sendUpdatedGoal(updatedGoal);
                     }
                     return goal;
                   })

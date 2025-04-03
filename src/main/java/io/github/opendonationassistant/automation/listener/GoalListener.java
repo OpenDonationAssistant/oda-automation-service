@@ -1,9 +1,11 @@
 package io.github.opendonationassistant.automation.listener;
 
 import io.github.opendonationassistant.automation.AutomationRule;
+import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
+import io.github.opendonationassistant.events.goal.GoalSender;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
@@ -21,25 +23,26 @@ public class GoalListener {
   private AutomationRuleRepository ruleRepository;
   private TriggerFactory triggerFactory;
   private ActionFactory actionFactory;
+  private GoalSender goalSender;
+  private WidgetsApi widgets;
 
   @Inject
   public GoalListener(
     AutomationRuleRepository ruleRepository,
     TriggerFactory triggerFactory,
-    ActionFactory actionFactory
+    ActionFactory actionFactory,
+    GoalSender goalSender,
+    WidgetsApi widgets
   ) {
     this.triggerFactory = triggerFactory;
     this.actionFactory = actionFactory;
     this.ruleRepository = ruleRepository;
+    this.goalSender = goalSender;
+    this.widgets = widgets;
   }
 
   @Queue(io.github.opendonationassistant.rabbit.Queue.Events.GOAL)
   public void checkAutomationForUpdatedGoals(UpdatedGoal goal) {
-    try {
-      Thread.sleep(10000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
       goal.getRecipientId()
     );

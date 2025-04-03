@@ -4,6 +4,7 @@ import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.events.config.ConfigCommandSender;
+import io.github.opendonationassistant.events.goal.GoalSender;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -16,18 +17,21 @@ public class ActionFactory {
   private ConfigCommandSender configCommandSender;
   private WidgetsApi widgets;
   private AutomationVariableRepository variables;
+  private GoalSender goalSender;
 
   @Inject
   public ActionFactory(
     WidgetsApi widgets,
     WidgetCommandSender widgetCommandSender,
     ConfigCommandSender configCommandSender,
-    AutomationVariableRepository variables
+    AutomationVariableRepository variables,
+    GoalSender goalSender
   ) {
     this.widgetCommandSender = widgetCommandSender;
     this.configCommandSender = configCommandSender;
     this.widgets = widgets;
     this.variables = variables;
+    this.goalSender = goalSender;
   }
 
   public AutomationAction create(
@@ -48,7 +52,8 @@ public class ActionFactory {
         value,
         widgets,
         widgetCommandSender,
-        configCommandSender
+        configCommandSender,
+        goalSender
       );
       case "increase-variable" -> new IncreaseVariableAction(
         id,
