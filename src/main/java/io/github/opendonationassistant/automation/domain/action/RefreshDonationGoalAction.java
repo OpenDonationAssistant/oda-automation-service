@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,9 +67,26 @@ public class RefreshDonationGoalAction extends AutomationAction {
                 final List<Map<String, Object>> updatedGoals = existingGoals
                   .map(goal -> {
                     if (goalId.equals(goal.get("id"))) {
+                      final Map<String, Object> required =
+                        ((Map<String, Object>) goal.getOrDefault(
+                            "requiredAmount",
+                            Map.of()
+                          ));
+                      Integer requiredAmount = (Integer) required.getOrDefault(
+                        "major",
+                        0
+                      );
+                      final Map<String, Object> collected =
+                        ((Map<String, Object>) goal.getOrDefault(
+                            "accumulatedAmount",
+                            Map.of()
+                          ));
+                      Integer collectedAmount =
+                        (Integer) collected.getOrDefault("major", 0);
+                      int diff = requiredAmount - collectedAmount;
                       goal.put(
                         "accumulatedAmount",
-                        Map.of("major", 0, "currency", "RUB")
+                        Map.of("major", diff > 0 ? diff : 0, "currency", "RUB")
                       );
                     }
                     return goal;
