@@ -54,6 +54,29 @@ public class RefreshDonationGoalAction extends AutomationAction {
     return Optional.ofNullable((String) this.getValue().get("goalId"));
   }
 
+  private Integer getActualRequired() {
+    var goalId = getGoalId().get();
+    final Widget actualWidget = getWidgetId()
+      .map(widgetId -> widgets.getWidget(widgetId).join())
+      .get();
+    final Map<String, Object> config = actualWidget.getConfig();
+    final Stream<Map<String, Object>> existingGoals =
+      ((List<Map<String, Object>>) config.get("properties")).stream()
+        .filter(prop -> "goal".equals(prop.get("name")))
+        .flatMap(goal ->
+          ((List<Map<String, Object>>) goal.get("value")).stream()
+        );
+    return existingGoals
+      .filter(goal -> goalId.equals(goal.get("id")))
+      .map(goal -> {
+        final Map<String, Object> required =
+          ((Map<String, Object>) goal.getOrDefault("requiredAmount", Map.of()));
+        Integer requiredAmount = (Integer) required.getOrDefault("major", 0);
+        return requiredAmount;
+      })
+      .findAny().get();
+  }
+
   public void execute() {
     log.info("Checking RefreshDonationGoalAction");
     getGoalId()
@@ -79,6 +102,7 @@ public class RefreshDonationGoalAction extends AutomationAction {
                   "major",
                   0
                 );
+                goal.put("requiredAmount",Map.of("major", getActualRequired(), "minor", 0, "currency", "RUB"));
                 final Map<String, Object> collected =
                   ((Map<String, Object>) goal.getOrDefault(
                       "accumulatedAmount",
