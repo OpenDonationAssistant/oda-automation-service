@@ -79,6 +79,11 @@ public class RefreshDonationGoalAction extends AutomationAction {
 
   public void execute() {
     log.info("Checking RefreshDonationGoalAction");
+    try{
+      Thread.sleep(2000);
+    } catch(Exception e){
+      e.printStackTrace();
+    }
     getGoalId()
       .ifPresent(goalId ->
         widget.ifPresent(it -> {
