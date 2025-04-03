@@ -46,6 +46,11 @@ public class GoalListener {
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
       goal.getRecipientId()
     );
+    try {
+      Thread.sleep(3000);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     rules.forEach(rule ->
       rule
         .getTriggers()
