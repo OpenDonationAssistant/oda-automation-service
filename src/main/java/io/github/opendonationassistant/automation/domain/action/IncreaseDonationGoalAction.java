@@ -2,6 +2,8 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
+import io.github.opendonationassistant.events.config.ConfigCommandSender;
+import io.github.opendonationassistant.events.config.ConfigPutCommand;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import io.github.opendonationassistant.events.widget.WidgetConfig;
 import io.github.opendonationassistant.events.widget.WidgetProperty;
@@ -21,16 +23,19 @@ public class IncreaseDonationGoalAction extends AutomationAction {
 
   private WidgetsApi widgets;
   private WidgetCommandSender widgetCommandSender;
+  private ConfigCommandSender configCommandSender;
 
   public IncreaseDonationGoalAction(
     String id,
     Map<String, Object> value,
     WidgetsApi widgets,
-    WidgetCommandSender widgetCommandSender
+    WidgetCommandSender widgetCommandSender,
+    ConfigCommandSender configCommandSender
   ) {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
+    this.configCommandSender = configCommandSender;
   }
 
   public Optional<Integer> getIncreaseAmount() {
@@ -60,45 +65,51 @@ public class IncreaseDonationGoalAction extends AutomationAction {
                 .flatMap(goal ->
                   ((List<Map<String, Object>>) goal.get("value")).stream()
                 );
+            final List<Map<String, Object>> updatedGoals = existingGoals
+              .map(goal -> {
+                if (
+                  getGoalId()
+                    .filter(id -> id.equals(goal.get("id")))
+                    .isPresent()
+                ) {
+                  final Map<String, Object> required =
+                    ((Map<String, Object>) goal.getOrDefault(
+                        "requiredAmount",
+                        Map.of()
+                      ));
+                  Integer totalAmount = (Integer) required.getOrDefault(
+                    "major",
+                    0
+                  );
+                  goal.put(
+                    "requiredAmount",
+                    Map.of(
+                      "major",
+                      totalAmount + getIncreaseAmount().orElse(0),
+                      "currency",
+                      "RUB"
+                    )
+                  );
+                }
+                return goal;
+              })
+              .toList();
             var goals = new WidgetProperty();
             goals.setName("goal");
-            goals.setValue(
-              existingGoals
-                .map(goal -> {
-                  if (
-                    getGoalId()
-                      .filter(id -> id.equals(goal.get("id")))
-                      .isPresent()
-                  ) {
-                    final Map<String, Object> required =
-                      ((Map<String, Object>) goal.getOrDefault(
-                          "requiredAmount",
-                          Map.of()
-                        ));
-                    Integer totalAmount = (Integer) required.getOrDefault(
-                      "major",
-                      0
-                    );
-                    goal.put(
-                      "requiredAmount",
-                      Map.of(
-                        "major",
-                        totalAmount + getIncreaseAmount().orElse(0),
-                        "currency",
-                        "RUB"
-                      )
-                    );
-                  }
-                  return goal;
-                })
-                .toList()
-            );
+            goals.setValue(updatedGoals);
 
             var patch = new WidgetConfig();
             patch.setProperties(List.of(goals));
             widgetCommandSender.send(
               new WidgetUpdateCommand(it.getId(), patch)
             );
+
+            var command = new ConfigPutCommand();
+            command.setKey("goals");
+            command.setValue(updatedGoals);
+            command.setOwnerId(it.getOwnerId());
+            command.setName("paymentpage");
+            configCommandSender.send(command);
           })
           .join(); // TODO: join?
       });
