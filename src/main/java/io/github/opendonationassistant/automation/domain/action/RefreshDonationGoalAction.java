@@ -55,7 +55,6 @@ public class RefreshDonationGoalAction extends AutomationAction {
               .thenAccept(it -> {
                 log.info("Updating goal in widget {}", it.getId());
                 final Map<String, Object> config = it.getConfig();
-                log.info("existing config: {}", config);
                 final Stream<Map<String, Object>> existingGoals =
                   ((List<Map<String, Object>>) config.get(
                       "properties"
@@ -84,6 +83,12 @@ public class RefreshDonationGoalAction extends AutomationAction {
                       Integer collectedAmount =
                         (Integer) collected.getOrDefault("major", 0);
                       int diff = collectedAmount - requiredAmount;
+                      log.info(
+                        "changing collected amount, previous: {}, required: {}, diff: {}",
+                        collectedAmount,
+                        requiredAmount,
+                        diff
+                      );
                       goal.put(
                         "accumulatedAmount",
                         Map.of("major", diff > 0 ? diff : 0, "currency", "RUB")

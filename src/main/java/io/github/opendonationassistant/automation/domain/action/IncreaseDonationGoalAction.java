@@ -59,7 +59,6 @@ public class IncreaseDonationGoalAction extends AutomationAction {
           .thenAccept(it -> {
             log.info("Updating amount in goal in widget {}", it.getId());
             final Map<String, Object> config = it.getConfig();
-            log.info("existing config: {}", config);
             final Stream<Map<String, Object>> existingGoals =
               ((List<Map<String, Object>>) config.get("properties")).stream()
                 .filter(prop -> "goal".equals(prop.get("name")))
@@ -81,6 +80,11 @@ public class IncreaseDonationGoalAction extends AutomationAction {
                   Integer totalAmount = (Integer) required.getOrDefault(
                     "major",
                     0
+                  );
+                  log.info(
+                    "changing required amount, previous: {}, addition: {}",
+                    totalAmount,
+                    getIncreaseAmount().orElse(0)
                   );
                   goal.put(
                     "requiredAmount",
@@ -112,7 +116,6 @@ public class IncreaseDonationGoalAction extends AutomationAction {
             command.setOwnerId(it.getOwnerId());
             command.setName("paymentpage");
             log.info("config patch: {}", updatedGoals);
-            //configCommandSender.send(command);
           })
           .join(); // TODO: join?
       });
