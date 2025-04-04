@@ -53,7 +53,7 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
               Map.of()
             ));
         Integer collectedAmount = (Integer) collected.getOrDefault("major", 0);
-        if (collectedAmount > requiredAmount) {
+        if (collectedAmount >= requiredAmount) {
           log.info(
             "FilledDonationGoalTrigger is triggered for goal {} with required {} and collected {}",
             updatedGoal.getGoalId(),
