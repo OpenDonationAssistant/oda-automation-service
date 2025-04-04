@@ -61,7 +61,7 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
             collectedAmount
           );
         }
-        return collectedAmount > requiredAmount;
+        return collectedAmount >= requiredAmount;
       })
       .filter(result -> result)
       .findAny()
