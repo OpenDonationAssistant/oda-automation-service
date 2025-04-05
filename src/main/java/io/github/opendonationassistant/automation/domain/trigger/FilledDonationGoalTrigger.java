@@ -27,9 +27,10 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
   @Override
   public boolean isTriggered(UpdatedGoal updatedGoal) {
     log.info(
-      "FilledDonationGoalTrigger is checking goal {}, widget {}",
+      "FilledDonationGoalTrigger is checking goal {}, widget {}, recipient {}",
       updatedGoal.getGoalId(),
-      updatedGoal.getWidgetId()
+      updatedGoal.getWidgetId(),
+      updatedGoal.getRecipientId()
     );
 
     final Widget widget = widgets.getWidget(updatedGoal.getWidgetId()).join();
