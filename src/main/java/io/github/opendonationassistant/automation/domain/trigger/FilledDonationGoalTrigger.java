@@ -33,40 +33,49 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
       updatedGoal.getRecipientId()
     );
 
-    final Widget widget = widgets.getWidget(updatedGoal.getWidgetId()).join();
-    final Map<String, Object> config = widget.getConfig();
-    final Stream<Map<String, Object>> existingGoals =
-      ((List<Map<String, Object>>) config.get("properties")).stream()
-        .filter(prop -> "goal".equals(prop.get("name")))
-        .flatMap(goal ->
-          ((List<Map<String, Object>>) goal.get("value")).stream()
-        );
+    boolean isTriggered = updatedGoal.getAccumulatedAmount().getMajor() >= updatedGoal.getRequiredAmount().getMajor();
 
-    boolean isTriggered = existingGoals
-      .filter(goal -> updatedGoal.getGoalId().equals(goal.get("id")))
-      .map(goal -> {
-        final Map<String, Object> required =
-          ((Map<String, Object>) goal.getOrDefault("requiredAmount", Map.of()));
-        Integer requiredAmount = (Integer) required.getOrDefault("major", 0);
-        final Map<String, Object> collected =
-          ((Map<String, Object>) goal.getOrDefault(
-              "accumulatedAmount",
-              Map.of()
-            ));
-        Integer collectedAmount = (Integer) collected.getOrDefault("major", 0);
-        if (collectedAmount >= requiredAmount) {
-          log.info(
-            "FilledDonationGoalTrigger is triggered for goal {} with required {} and collected {}",
-            updatedGoal.getGoalId(),
-            requiredAmount,
-            collectedAmount
-          );
-        }
-        return collectedAmount >= requiredAmount;
-      })
-      .filter(result -> result)
-      .findAny()
-      .isPresent();
+    //final Widget widget = widgets.getWidget(updatedGoal.getWidgetId()).join();
+    //final Map<String, Object> config = widget.getConfig();
+    //final Stream<Map<String, Object>> existingGoals =
+    //  ((List<Map<String, Object>>) config.get("properties")).stream()
+    //    .filter(prop -> "goal".equals(prop.get("name")))
+    //    .flatMap(goal ->
+    //      ((List<Map<String, Object>>) goal.get("value")).stream()
+    //    );
+    //
+    //boolean isTriggered = existingGoals
+    //  .filter(goal -> updatedGoal.getGoalId().equals(goal.get("id")))
+    //  .map(goal -> {
+    //    final Map<String, Object> required =
+    //      ((Map<String, Object>) goal.getOrDefault("requiredAmount", Map.of()));
+    //    Integer requiredAmount = (Integer) required.getOrDefault("major", 0);
+    //    final Map<String, Object> collected =
+    //      ((Map<String, Object>) goal.getOrDefault(
+    //          "accumulatedAmount",
+    //          Map.of()
+    //        ));
+    //    Integer collectedAmount = (Integer) collected.getOrDefault("major", 0);
+    //    if (collectedAmount >= requiredAmount) {
+    //      log.info(
+    //        "FilledDonationGoalTrigger is triggered for goal {} with required {} and collected {}",
+    //        updatedGoal.getGoalId(),
+    //        requiredAmount,
+    //        collectedAmount
+    //      );
+    //    }
+    //    return collectedAmount >= requiredAmount;
+    //  })
+    //  .filter(result -> result)
+    //  .findAny()
+    //  .isPresent();
+
+    log.info(
+      "FilledDonationGoalTrigger is triggered for goal {} with required {} and collected {}",
+      updatedGoal.getGoalId(),
+      updatedGoal.getRequiredAmount().getMajor(),
+      updatedGoal.getAccumulatedAmount().getMajor()
+    );
 
     return isTriggered;
   }

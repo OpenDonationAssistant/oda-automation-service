@@ -5,6 +5,7 @@ import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.events.config.ConfigCommandSender;
 import io.github.opendonationassistant.events.goal.GoalSender;
+import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -37,7 +38,9 @@ public class ActionFactory {
   public AutomationAction create(
     String recipientId,
     String id,
-    Map<String, Object> value
+    Map<String, Object> value,
+    UpdatedGoal originGoal,
+    UpdatedGoal updatedGoal
   ) {
     return switch (id) {
       case "increase-donation-goal" -> new IncreaseDonationGoalAction(
@@ -45,7 +48,8 @@ public class ActionFactory {
         value,
         widgets,
         widgetCommandSender,
-        configCommandSender
+        configCommandSender,
+        updatedGoal
       );
       case "refresh-donation-goal" -> new RefreshDonationGoalAction(
         id,
@@ -53,7 +57,8 @@ public class ActionFactory {
         widgets,
         widgetCommandSender,
         configCommandSender,
-        goalSender
+        goalSender,
+        updatedGoal
       );
       case "increase-variable" -> new IncreaseVariableAction(
         id,

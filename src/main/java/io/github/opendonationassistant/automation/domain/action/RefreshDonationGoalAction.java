@@ -28,6 +28,7 @@ public class RefreshDonationGoalAction extends AutomationAction {
   private ConfigCommandSender configCommandSender;
   private GoalSender goalSender;
   private final Optional<Widget> widget;
+  private final UpdatedGoal goal;
 
   public RefreshDonationGoalAction(
     String id,
@@ -35,13 +36,15 @@ public class RefreshDonationGoalAction extends AutomationAction {
     WidgetsApi widgets,
     WidgetCommandSender widgetCommandSender,
     ConfigCommandSender configCommandSender,
-    GoalSender goalSender
+    GoalSender goalSender,
+    UpdatedGoal goal
   ) {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
     this.configCommandSender = configCommandSender;
     this.goalSender = goalSender;
+    this.goal = goal;
     this.widget = getWidgetId()
       .map(widgetId -> widgets.getWidget(widgetId).join());
   }
@@ -74,16 +77,27 @@ public class RefreshDonationGoalAction extends AutomationAction {
         Integer requiredAmount = (Integer) required.getOrDefault("major", 0);
         return requiredAmount;
       })
-      .findAny().get();
+      .findAny()
+      .get();
   }
 
   public void execute() {
+    var diff =
+      goal.getAccumulatedAmount().getMajor() -
+      goal.getRequiredAmount().getMajor();
+    diff = diff > 0 ? diff : 0;
+    log.info(
+      "Executing RefreshDonationGoalAction: {}, goal: {}, current amount: {}, diff: {}",
+      getWidgetId(),
+      goal.getRequiredAmount().getMajor(),
+      goal.getAccumulatedAmount().getMajor(),
+      diff
+    );
+    goal.setAccumulatedAmount(new Amount(diff, 0, "RUB"));
+  }
+
+  public void oldexecute() {
     log.info("Checking RefreshDonationGoalAction");
-    try {
-      Thread.sleep(2000);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
     getGoalId()
       .ifPresent(goalId ->
         widget.ifPresent(it -> {
@@ -107,7 +121,17 @@ public class RefreshDonationGoalAction extends AutomationAction {
                   "major",
                   0
                 );
-                goal.put("requiredAmount",Map.of("major", getActualRequired(), "minor", 0, "currency", "RUB"));
+                goal.put(
+                  "requiredAmount",
+                  Map.of(
+                    "major",
+                    getActualRequired(),
+                    "minor",
+                    0,
+                    "currency",
+                    "RUB"
+                  )
+                );
                 final Map<String, Object> collected =
                   ((Map<String, Object>) goal.getOrDefault(
                       "accumulatedAmount",

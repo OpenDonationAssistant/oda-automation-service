@@ -3,8 +3,10 @@ package io.github.opendonationassistant.automation.domain.action;
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.api.Widget;
 import io.github.opendonationassistant.automation.api.WidgetsApi;
+import io.github.opendonationassistant.commons.Amount;
 import io.github.opendonationassistant.events.config.ConfigCommandSender;
 import io.github.opendonationassistant.events.config.ConfigPutCommand;
+import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.github.opendonationassistant.events.widget.WidgetCommandSender;
 import io.github.opendonationassistant.events.widget.WidgetConfig;
 import io.github.opendonationassistant.events.widget.WidgetProperty;
@@ -25,6 +27,7 @@ public class IncreaseDonationGoalAction extends AutomationAction {
   private WidgetsApi widgets;
   private WidgetCommandSender widgetCommandSender;
   private ConfigCommandSender configCommandSender;
+  private UpdatedGoal goal;
 
   private final Optional<Widget> widget;
 
@@ -33,18 +36,22 @@ public class IncreaseDonationGoalAction extends AutomationAction {
     Map<String, Object> value,
     WidgetsApi widgets,
     WidgetCommandSender widgetCommandSender,
-    ConfigCommandSender configCommandSender
+    ConfigCommandSender configCommandSender,
+    UpdatedGoal goal
   ) {
     super(id, value);
     this.widgets = widgets;
     this.widgetCommandSender = widgetCommandSender;
     this.configCommandSender = configCommandSender;
+    this.goal = goal;
     this.widget = getWidgetId()
       .map(widgetId -> widgets.getWidget(widgetId).join());
   }
 
-  public Optional<Integer> getIncreaseAmount() {
-    return Optional.ofNullable((Integer) this.getValue().get("amount"));
+  public Integer getIncreaseAmount() {
+    return Optional.ofNullable((Integer) this.getValue().get("amount")).orElse(
+      0
+    );
   }
 
   public Optional<String> getWidgetId() {
@@ -56,6 +63,22 @@ public class IncreaseDonationGoalAction extends AutomationAction {
   }
 
   public void execute() {
+    log.info(
+      "Executing IncreaseDonationGoalAction: {}, previous amount: {}, increment: {}",
+      getWidgetId(),
+      goal.getRequiredAmount().getMajor(),
+      getIncreaseAmount()
+    );
+    goal.setRequiredAmount(
+      new Amount(
+        goal.getRequiredAmount().getMajor() + getIncreaseAmount(),
+        goal.getRequiredAmount().getMinor(),
+        "RUB"
+      )
+    );
+  }
+
+  public void oldExecute() {
     log.info("Checking IncreaseDonationGoalAction: {}", getWidgetId());
     widget.ifPresent(it -> {
       log.info("Updating amount in goal in widget {}", it.getId());
@@ -78,13 +101,13 @@ public class IncreaseDonationGoalAction extends AutomationAction {
             log.info(
               "changing required amount, previous: {}, addition: {}",
               totalAmount,
-              getIncreaseAmount().orElse(0)
+              getIncreaseAmount()
             );
             goal.put(
               "requiredAmount",
               Map.of(
                 "major",
-                totalAmount + getIncreaseAmount().orElse(0),
+                totalAmount + getIncreaseAmount(),
                 "currency",
                 "RUB"
               )
@@ -101,13 +124,6 @@ public class IncreaseDonationGoalAction extends AutomationAction {
       var patch = new WidgetConfig();
       patch.setProperties(List.of(goals));
       widgetCommandSender.send(new WidgetUpdateCommand(it.getId(), patch));
-
-      var command = new ConfigPutCommand();
-      command.setKey("goals");
-      command.setValue(updatedGoals);
-      command.setOwnerId(it.getOwnerId());
-      command.setName("paymentpage");
-      log.info("config patch: {}", updatedGoals);
     });
   }
 }
