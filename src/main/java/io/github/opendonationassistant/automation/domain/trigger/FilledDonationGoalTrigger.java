@@ -33,7 +33,9 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
       updatedGoal.getRecipientId()
     );
 
-    boolean isTriggered = updatedGoal.getAccumulatedAmount().getMajor() >= updatedGoal.getRequiredAmount().getMajor();
+    boolean isTriggered =
+      updatedGoal.getAccumulatedAmount().getMajor() >=
+      updatedGoal.getRequiredAmount().getMajor();
 
     //final Widget widget = widgets.getWidget(updatedGoal.getWidgetId()).join();
     //final Map<String, Object> config = widget.getConfig();

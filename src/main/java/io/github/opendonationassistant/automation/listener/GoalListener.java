@@ -63,11 +63,13 @@ public class GoalListener {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    UpdatedGoal updatedGoal = process(goal, rules);
-    while (checkForRepeat(goal, updatedGoal)) {
-      updatedGoal = process(updatedGoal, rules);
+    UpdatedGoal processedGoal = process(goal, rules);
+    UpdatedGoal updatedGoal = processedGoal;
+    while (checkForRepeat(updatedGoal, processedGoal)) {
+      updatedGoal = processedGoal;
+      processedGoal = process(updatedGoal, rules);
     }
-    updateGoal(updatedGoal);
+    updateGoal(processedGoal);
   }
 
   private void updateGoal(UpdatedGoal goal) {
