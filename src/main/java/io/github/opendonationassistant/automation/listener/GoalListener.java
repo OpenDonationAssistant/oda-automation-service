@@ -64,7 +64,7 @@ public class GoalListener {
       e.printStackTrace();
     }
     UpdatedGoal processedGoal = process(goal, rules);
-    UpdatedGoal updatedGoal = processedGoal;
+    UpdatedGoal updatedGoal = goal;
     while (checkForRepeat(updatedGoal, processedGoal)) {
       updatedGoal = processedGoal;
       processedGoal = process(updatedGoal, rules);
