@@ -98,6 +98,17 @@ public class GoalListener {
               "RUB"
             )
           );
+          existingGoal.put(
+            "accumulatedAmount",
+            Map.of(
+              "major",
+              goal.getAccumulatedAmount().getMajor(),
+              "minor",
+              goal.getAccumulatedAmount().getMinor(),
+              "currency",
+              "RUB"
+            )
+          );
         }
         return existingGoal;
       })
