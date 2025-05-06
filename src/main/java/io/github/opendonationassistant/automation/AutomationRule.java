@@ -50,6 +50,10 @@ public class AutomationRule {
     );
   }
 
+  public void delete(){
+    repository.deleteById(this.getId());
+  }
+
   public String getId() {
     return this.id;
   }
