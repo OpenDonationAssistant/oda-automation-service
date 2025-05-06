@@ -19,6 +19,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -163,6 +164,7 @@ public class SetState extends BaseController {
       );
   }
 
+  @Serdeable
   public static record SetStateCommand(
     List<AutomationRuleDto> rules,
     List<AutomationVariableDto> variables
