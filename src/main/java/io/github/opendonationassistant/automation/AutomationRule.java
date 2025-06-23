@@ -5,6 +5,7 @@ import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
 import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
+import io.github.opendonationassistant.commons.ToString;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
@@ -105,11 +106,7 @@ public class AutomationRule {
 
   @Override
   public String toString() {
-    try {
-      return ObjectMapper.getDefault().writeValueAsString(this);
-    } catch (Exception e) {
-      return "Can't serialize as  json";
-    }
+    return ToString.asJson(this);
   }
 
   @Override

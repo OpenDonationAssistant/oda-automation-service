@@ -59,7 +59,7 @@ public class GoalListener {
       goal.getRecipientId()
     );
     try {
-      Thread.sleep(3000);
+      Thread.sleep(7000);
     } catch (Exception e) {
       e.printStackTrace();
     }
