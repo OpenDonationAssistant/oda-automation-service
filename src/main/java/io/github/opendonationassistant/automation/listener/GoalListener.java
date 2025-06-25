@@ -7,6 +7,7 @@ import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.commons.Amount;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.events.goal.GoalSender;
 import io.github.opendonationassistant.events.goal.GoalSender.Stage;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
@@ -14,9 +15,12 @@ import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 @RabbitListener
 public class GoalListener {
+
+  private final ODALogger log = new ODALogger(this);
 
   private final AutomationRuleRepository ruleRepository;
   private final TriggerFactory triggerFactory;
@@ -41,6 +45,7 @@ public class GoalListener {
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
       updated.recipientId()
     );
+    log.info("Handling UpdatedGoal", Map.of("goal", updated, "rules", rules));
 
     var goal = new Goal(
       updated.goalId(),
