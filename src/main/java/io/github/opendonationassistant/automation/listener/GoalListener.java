@@ -2,158 +2,74 @@ package io.github.opendonationassistant.automation.listener;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationRule;
-import io.github.opendonationassistant.automation.api.Widget;
-import io.github.opendonationassistant.automation.api.WidgetsApi;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.commons.Amount;
 import io.github.opendonationassistant.events.goal.GoalSender;
+import io.github.opendonationassistant.events.goal.GoalSender.Stage;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
-import io.github.opendonationassistant.events.widget.WidgetCommandSender;
-import io.github.opendonationassistant.events.widget.WidgetConfig;
-import io.github.opendonationassistant.events.widget.WidgetProperty;
-import io.github.opendonationassistant.events.widget.WidgetUpdateCommand;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RabbitListener
 public class GoalListener {
 
-  private Logger log = LoggerFactory.getLogger(GoalListener.class);
-
-  private AutomationRuleRepository ruleRepository;
-  private TriggerFactory triggerFactory;
-  private ActionFactory actionFactory;
-  private GoalSender goalSender;
-  private WidgetsApi widgets;
-
-  private final WidgetCommandSender widgetCommandSender;
+  private final AutomationRuleRepository ruleRepository;
+  private final TriggerFactory triggerFactory;
+  private final ActionFactory actionFactory;
+  private final GoalSender goalSender;
 
   @Inject
   public GoalListener(
     AutomationRuleRepository ruleRepository,
     TriggerFactory triggerFactory,
     ActionFactory actionFactory,
-    GoalSender goalSender,
-    WidgetsApi widgets,
-    WidgetCommandSender widgetCommandSender
+    GoalSender goalSender
   ) {
     this.triggerFactory = triggerFactory;
     this.actionFactory = actionFactory;
     this.ruleRepository = ruleRepository;
     this.goalSender = goalSender;
-    this.widgets = widgets;
-    this.widgetCommandSender = widgetCommandSender;
   }
 
-  @Queue(io.github.opendonationassistant.rabbit.Queue.Events.GOAL)
+  @Queue(io.github.opendonationassistant.rabbit.Queue.Automation.GOAL)
   public void checkAutomationForUpdatedGoals(UpdatedGoal goal) {
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
-      goal.getRecipientId()
+      goal.recipientId()
     );
-    try {
-      Thread.sleep(7000);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    UpdatedGoal processedGoal = process(goal, rules);
+
     UpdatedGoal updatedGoal = goal;
-    while (checkForRepeat(updatedGoal, processedGoal)) {
-      updatedGoal = processedGoal;
-      processedGoal = process(updatedGoal, rules);
-    }
-    updateGoal(processedGoal);
-  }
+    do {
+      updatedGoal = goal;
+      goal = process(updatedGoal, rules);
+    } while (checkHasChanges(updatedGoal, goal));
 
-  private void updateGoal(UpdatedGoal goal) {
-    final Widget widget = widgets.getWidget(goal.getWidgetId()).join();
-    log.info("Updating widget {}", widget.getId());
-    final Map<String, Object> config = widget.getConfig();
-
-    final Stream<Map<String, Object>> existingGoals =
-      ((List<Map<String, Object>>) config.get("properties")).stream()
-        .filter(prop -> "goal".equals(prop.get("name")))
-        .flatMap(existingGoal ->
-          ((List<Map<String, Object>>) existingGoal.get("value")).stream()
-        );
-
-    final List<Map<String, Object>> updatedGoals = existingGoals
-      .map(existingGoal -> {
-        if (goal.getGoalId().equals(existingGoal.get("id"))) {
-          existingGoal.put(
-            "requiredAmount",
-            Map.of(
-              "major",
-              goal.getRequiredAmount().getMajor(),
-              "minor",
-              goal.getRequiredAmount().getMinor(),
-              "currency",
-              "RUB"
-            )
-          );
-          existingGoal.put(
-            "accumulatedAmount",
-            Map.of(
-              "major",
-              goal.getAccumulatedAmount().getMajor(),
-              "minor",
-              goal.getAccumulatedAmount().getMinor(),
-              "currency",
-              "RUB"
-            )
-          );
-        }
-        return existingGoal;
-      })
-      .toList();
-    var goals = new WidgetProperty();
-    goals.setName("goal");
-    goals.setValue(updatedGoals);
-    log.info("widget patch: {}", updatedGoals);
-
-    var patch = new WidgetConfig();
-    patch.setProperties(List.of(goals));
-    widgetCommandSender.send(new WidgetUpdateCommand(widget.getId(), patch));
-  }
-
-  private boolean checkForRepeat(UpdatedGoal origin, UpdatedGoal updated) {
-    return (
-      updated.getAccumulatedAmount().getMajor() !=
-        origin.getAccumulatedAmount().getMajor() ||
-      updated.getRequiredAmount().getMajor() !=
-      origin.getRequiredAmount().getMajor()
-    );
+    updateGoal(goal);
   }
 
   private UpdatedGoal process(UpdatedGoal goal, List<AutomationRule> rules) {
-    var updatedGoal = new UpdatedGoal();
-    updatedGoal.setGoalId(goal.getGoalId());
-    updatedGoal.setWidgetId(goal.getWidgetId());
-    updatedGoal.setIsDefault(goal.getIsDefault());
-    updatedGoal.setRecipientId(goal.getRecipientId());
-    updatedGoal.setRequiredAmount(
+    var updatedGoal = new UpdatedGoal(
+      goal.goalId(),
+      goal.widgetId(),
+      goal.recipientId(),
+      goal.fullDescription(),
+      goal.briefDescription(),
       new Amount(
-        goal.getRequiredAmount().getMajor(),
-        goal.getRequiredAmount().getMinor(),
-        goal.getRequiredAmount().getCurrency()
-      )
-    );
-    updatedGoal.setAccumulatedAmount(
+        goal.requiredAmount().getMajor(),
+        goal.requiredAmount().getMinor(),
+        goal.requiredAmount().getCurrency()
+      ),
       new Amount(
-        goal.getAccumulatedAmount().getMajor(),
-        goal.getAccumulatedAmount().getMinor(),
-        goal.getAccumulatedAmount().getCurrency()
-      )
+        goal.accumulatedAmount().getMajor(),
+        goal.accumulatedAmount().getMinor(),
+        goal.accumulatedAmount().getCurrency()
+      ),
+      goal.isDefault()
     );
-    updatedGoal.setFullDescription(goal.getFullDescription());
-    updatedGoal.setBriefDescription(goal.getBriefDescription());
+
     rules.forEach(rule ->
       rule
         .getTriggers()
@@ -169,7 +85,7 @@ public class GoalListener {
             .stream()
             .map(action ->
               actionFactory.create(
-                goal.getRecipientId(),
+                goal.recipientId(),
                 action.getId(),
                 action.getValue(),
                 goal,
@@ -181,5 +97,18 @@ public class GoalListener {
         })
     );
     return updatedGoal;
+  }
+
+  private boolean checkHasChanges(UpdatedGoal origin, UpdatedGoal updated) {
+    boolean accumulatedChanged =
+      updated.accumulatedAmount().getMajor() !=
+      origin.accumulatedAmount().getMajor();
+    boolean requiredChanged =
+      updated.requiredAmount().getMajor() != origin.requiredAmount().getMajor();
+    return (accumulatedChanged || requiredChanged);
+  }
+
+  private void updateGoal(UpdatedGoal goal) {
+    goalSender.sendGoal(Stage.AFTER_AUTOMATION, goal);
   }
 }
