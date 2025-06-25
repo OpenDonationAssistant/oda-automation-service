@@ -27,8 +27,7 @@ public class AutomationAction {
     return new AutomationActionDto(this.id, this.value);
   }
 
-  public void execute() {
-  }
+  public void execute() {}
 
   public String getId() {
     return id;

@@ -3,6 +3,7 @@ package io.github.opendonationassistant.automation.listener;
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
+import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.commons.Amount;
@@ -36,12 +37,23 @@ public class GoalListener {
   }
 
   @Queue(io.github.opendonationassistant.rabbit.Queue.Automation.GOAL)
-  public void checkAutomationForUpdatedGoals(UpdatedGoal goal) {
+  public void checkAutomationForUpdatedGoals(UpdatedGoal updated) {
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
-      goal.recipientId()
+      updated.recipientId()
     );
 
-    UpdatedGoal updatedGoal = goal;
+    var goal = new Goal(
+      updated.goalId(),
+      updated.widgetId(),
+      updated.recipientId(),
+      updated.fullDescription(),
+      updated.briefDescription(),
+      updated.requiredAmount(),
+      updated.accumulatedAmount(),
+      updated.isDefault()
+    );
+
+    Goal updatedGoal = goal;
     do {
       updatedGoal = goal;
       goal = process(updatedGoal, rules);
@@ -50,24 +62,24 @@ public class GoalListener {
     updateGoal(goal);
   }
 
-  private UpdatedGoal process(UpdatedGoal goal, List<AutomationRule> rules) {
-    var updatedGoal = new UpdatedGoal(
-      goal.goalId(),
-      goal.widgetId(),
-      goal.recipientId(),
-      goal.fullDescription(),
-      goal.briefDescription(),
+  private Goal process(Goal goal, List<AutomationRule> rules) {
+    var updatedGoal = new Goal(
+      goal.getGoalId(),
+      goal.getGoalId(),
+      goal.getRecipientId(),
+      goal.getFullDescription(),
+      goal.getBriefDescription(),
       new Amount(
-        goal.requiredAmount().getMajor(),
-        goal.requiredAmount().getMinor(),
-        goal.requiredAmount().getCurrency()
+        goal.getRequiredAmount().getMajor(),
+        goal.getRequiredAmount().getMinor(),
+        goal.getRequiredAmount().getCurrency()
       ),
       new Amount(
-        goal.accumulatedAmount().getMajor(),
-        goal.accumulatedAmount().getMinor(),
-        goal.accumulatedAmount().getCurrency()
+        goal.getAccumulatedAmount().getMajor(),
+        goal.getAccumulatedAmount().getMinor(),
+        goal.getAccumulatedAmount().getCurrency()
       ),
-      goal.isDefault()
+      goal.getIsDefault()
     );
 
     rules.forEach(rule ->
@@ -85,10 +97,9 @@ public class GoalListener {
             .stream()
             .map(action ->
               actionFactory.create(
-                goal.recipientId(),
+                goal.getRecipientId(),
                 action.getId(),
                 action.getValue(),
-                goal,
                 updatedGoal
               )
             )
@@ -99,16 +110,29 @@ public class GoalListener {
     return updatedGoal;
   }
 
-  private boolean checkHasChanges(UpdatedGoal origin, UpdatedGoal updated) {
+  private boolean checkHasChanges(Goal origin, Goal updated) {
     boolean accumulatedChanged =
-      updated.accumulatedAmount().getMajor() !=
-      origin.accumulatedAmount().getMajor();
+      updated.getAccumulatedAmount().getMajor() !=
+      origin.getAccumulatedAmount().getMajor();
     boolean requiredChanged =
-      updated.requiredAmount().getMajor() != origin.requiredAmount().getMajor();
+      updated.getRequiredAmount().getMajor() !=
+      origin.getRequiredAmount().getMajor();
     return (accumulatedChanged || requiredChanged);
   }
 
-  private void updateGoal(UpdatedGoal goal) {
-    goalSender.sendGoal(Stage.AFTER_AUTOMATION, goal);
+  private void updateGoal(Goal goal) {
+    goalSender.sendGoal(
+      Stage.AFTER_AUTOMATION,
+      new UpdatedGoal(
+        goal.getGoalId(),
+        goal.getWidgetId(),
+        goal.getRecipientId(),
+        goal.getFullDescription(),
+        goal.getBriefDescription(),
+        goal.getRequiredAmount(),
+        goal.getAccumulatedAmount(),
+        goal.getIsDefault()
+      )
+    );
   }
 }

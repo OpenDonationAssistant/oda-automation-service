@@ -1,8 +1,8 @@
 package io.github.opendonationassistant.automation;
 
+import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData.AutomationTriggerData;
-import io.github.opendonationassistant.events.goal.UpdatedGoal;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
@@ -20,7 +20,7 @@ public class AutomationTrigger {
     this.value = value;
   }
 
-  public boolean isTriggered(UpdatedGoal goal) {
+  public boolean isTriggered(Goal goal) {
     return false;
   }
 
