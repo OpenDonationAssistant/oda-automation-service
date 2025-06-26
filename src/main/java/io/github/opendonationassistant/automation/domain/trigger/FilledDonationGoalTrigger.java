@@ -37,8 +37,9 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
         updatedGoal.getRequiredAmount().getMajor());
 
     log.info(
-      "FilledDonationGoalTrigger is triggered for goal {} with required {} and collected {}",
+      "FilledDonationGoalTrigger is triggered for goal {} , widgetId {}, with required {} and collected {}",
       updatedGoal.getGoalId(),
+      getWidgetId().get(),
       updatedGoal.getRequiredAmount().getMajor(),
       updatedGoal.getAccumulatedAmount().getMajor()
     );
