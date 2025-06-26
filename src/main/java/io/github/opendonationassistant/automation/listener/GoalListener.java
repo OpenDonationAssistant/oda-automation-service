@@ -45,7 +45,11 @@ public class GoalListener {
     final List<AutomationRule> rules = ruleRepository.listByRecipientId(
       updated.recipientId()
     );
-    log.info("Handling UpdatedGoal", Map.of("goal", updated, "rules", rules));
+
+    log.info(
+      "Handling UpdatedGoal",
+      Map.of("goal", updated, "rules", rules)
+    );
 
     var goal = new Goal(
       updated.goalId(),
@@ -70,7 +74,7 @@ public class GoalListener {
   private Goal process(Goal goal, List<AutomationRule> rules) {
     var updatedGoal = new Goal(
       goal.getGoalId(),
-      goal.getGoalId(),
+      goal.getWidgetId(),
       goal.getRecipientId(),
       goal.getFullDescription(),
       goal.getBriefDescription(),
