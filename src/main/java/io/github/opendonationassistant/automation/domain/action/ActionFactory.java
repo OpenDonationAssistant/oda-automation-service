@@ -2,6 +2,7 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
+import io.github.opendonationassistant.automation.domain.reel.ReelCommandSender;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -11,10 +12,15 @@ import java.util.Map;
 public class ActionFactory {
 
   private final AutomationVariableRepository variables;
+  private final ReelCommandSender reelCommandSender;
 
   @Inject
-  public ActionFactory(AutomationVariableRepository variables) {
+  public ActionFactory(
+    AutomationVariableRepository variables,
+    ReelCommandSender reelCommandSender
+  ) {
     this.variables = variables;
+    this.reelCommandSender = reelCommandSender;
   }
 
   public AutomationAction create(
@@ -39,6 +45,12 @@ public class ActionFactory {
         value,
         recipientId,
         variables
+      );
+      case "run-reel" -> new RunReelAction(
+        id,
+        value,
+        recipientId,
+        reelCommandSender
       );
       default -> new AutomationAction(id, value);
     };

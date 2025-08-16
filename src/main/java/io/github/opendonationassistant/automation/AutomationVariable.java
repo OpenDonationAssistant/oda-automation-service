@@ -95,14 +95,4 @@ public class AutomationVariable<T> {
   public void setValue(T value) {
     this.value = value;
   }
-
-  @Override
-  public boolean equals(Object o) {
-    return AutomationVariableObject.equals(this, o);
-  }
-
-  @Override
-  public int hashCode() {
-    return AutomationVariableObject.hashCode(this);
-  }
 }
