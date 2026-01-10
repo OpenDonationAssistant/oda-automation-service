@@ -26,11 +26,13 @@ public class AutomationVariable<T> {
     String recipientId,
     String id,
     String name,
+    T value,
     AutomationVariableDataRepository repository
   ) {
     this.recipientId = recipientId;
     this.id = id;
     this.repository = repository;
+    this.value = value;
     this.name = Optional.ofNullable(name).orElse("<Без названия>");
   }
 
@@ -38,8 +40,8 @@ public class AutomationVariable<T> {
     return new AutomationVariableData(
       this.getId(),
       "undefined",
-      this.getRecipientId(),
       this.getName(),
+      this.getRecipientId(),
       String.valueOf(this.getValue())
     );
   }

@@ -29,17 +29,21 @@ public class RunReelAction extends AutomationAction {
   }
 
   public void execute() {
+    final String reelId = (String) getValue().get("reelId");
     log.info(
       "Executing RunReelAction, reelId: {}, recipientId: {}",
-      (String) getValue().get("reelId"),
+      reelId,
       recipientId
     );
+    if (reelId == null) {
+      return;
+    }
     reelCommandSender.send(
       "reel",
       new ReelCommand(
         "select",
         "",
-        (String) getValue().get("reelId"),
+        reelId,
         "",
         recipientId
       )

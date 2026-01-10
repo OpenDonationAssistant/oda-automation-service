@@ -10,8 +10,6 @@ import java.math.BigDecimal;
 
 public class AutomationNumberVariable extends AutomationVariable<BigDecimal> {
 
-  private BigDecimal value;
-
   public AutomationNumberVariable(
     @Nonnull String recipientId,
     @Nonnull String id,
@@ -19,17 +17,22 @@ public class AutomationNumberVariable extends AutomationVariable<BigDecimal> {
     @Nullable BigDecimal value,
     @Nonnull AutomationVariableDataRepository repository
   ) {
-    super(recipientId, id, name, repository);
-    this.value = value == null ? BigDecimal.ZERO : value;
+    super(
+      recipientId,
+      id,
+      name,
+      value == null ? BigDecimal.ZERO : value,
+      repository
+    );
   }
 
   protected AutomationVariableData extractData() {
     return new AutomationVariableData(
-      this.getRecipientId(),
-      "number",
       this.getId(),
+      "number",
       this.getName(),
-      this.value.toPlainString()
+      this.getRecipientId(),
+      this.getValue().toPlainString()
     );
   }
 
@@ -40,13 +43,5 @@ public class AutomationNumberVariable extends AutomationVariable<BigDecimal> {
       "number",
       String.valueOf(this.getValue().intValue())
     );
-  }
-
-  public BigDecimal getValue() {
-    return value;
-  }
-
-  public void setValue(BigDecimal value) {
-    this.value = value;
   }
 }

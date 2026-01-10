@@ -1,6 +1,6 @@
 package io.github.opendonationassistant.automation.commands;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.instancio.Select.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -15,6 +15,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.instancio.Instancio;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
 import org.instancio.junit.WithSettings;
@@ -39,15 +40,16 @@ public class SetStateTest {
   @Test
   public void testCreatingState(
     @Given String recipientId,
-    @Given AutomationRuleDto rule,
-    @Given AutomationVariableDto variable
+    @Given AutomationRuleDto rule
   ) {
+    var variable = Instancio.of(AutomationVariableDto.class)
+      .set(field(AutomationVariableDto::type), "string")
+      .create();
     var auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(
       Map.of("preferred_username", recipientId)
     );
 
-    variable.setType("string");
     var command = new SetState.SetStateCommand(
       List.of(rule),
       List.of(variable)
@@ -61,8 +63,8 @@ public class SetStateTest {
       .getBody(AutomationDto.class);
 
     assertTrue(state.isPresent());
-    assertThat(state.get().getRules()).isEqualTo(List.of(rule));
-    assertThat(state.get().getVariables()).isEqualTo(List.of(variable));
+    assertEquals(List.of(rule), state.get().rules());
+    assertEquals(List.of(variable), state.get().variables());
   }
 
   @Test
@@ -70,19 +72,22 @@ public class SetStateTest {
     @Given String recipientId,
     @Given AutomationRuleDto rule1,
     @Given AutomationRuleDto rule2,
-    @Given AutomationRuleDto rule3,
-    @Given AutomationVariableDto variable1,
-    @Given AutomationVariableDto variable2,
-    @Given AutomationVariableDto variable3
+    @Given AutomationRuleDto rule3
   ) {
     var auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(
       Map.of("preferred_username", recipientId)
     );
 
-    variable1.setType("string");
-    variable2.setType("string");
-    variable3.setType("string");
+    var variable1 = Instancio.of(AutomationVariableDto.class)
+      .set(field(AutomationVariableDto::type), "string")
+      .create();
+    var variable2 = Instancio.of(AutomationVariableDto.class)
+      .set(field(AutomationVariableDto::type), "string")
+      .create();
+    var variable3 = Instancio.of(AutomationVariableDto.class)
+      .set(field(AutomationVariableDto::type), "string")
+      .create();
 
     var command = new SetState.SetStateCommand(
       List.of(rule1),
@@ -91,8 +96,8 @@ public class SetStateTest {
     setState.setState(auth, command);
 
     var updateCommand = new SetState.SetStateCommand(
-      List.of(rule2,rule3),
-      List.of(variable2,variable3)
+      List.of(rule2, rule3),
+      List.of(variable2, variable3)
     );
 
     setState.setState(auth, updateCommand);
@@ -102,8 +107,7 @@ public class SetStateTest {
       .getBody(AutomationDto.class);
 
     assertTrue(state.isPresent());
-    assertThat(state.get().getRules()).isEqualTo(List.of(rule2,rule3));
-    assertThat(state.get().getVariables()).isEqualTo(List.of(variable2, variable3));
-
+    assertEquals(List.of(rule2, rule3), state.get().rules());
+    assertEquals(List.of(variable2, variable3), state.get().variables());
   }
 }

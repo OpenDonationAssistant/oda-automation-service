@@ -9,7 +9,6 @@ import io.github.opendonationassistant.commons.ToString;
 import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
-
 import java.util.List;
 
 @Serdeable
@@ -51,7 +50,7 @@ public class AutomationRule {
     );
   }
 
-  public void delete(){
+  public void delete() {
     repository.deleteById(this.getId());
   }
 
@@ -84,24 +83,22 @@ public class AutomationRule {
   }
 
   public AutomationRuleDto asDto() {
-    var dto = new AutomationRuleDto();
-    dto.setId(this.getId());
-    dto.setActions(
-      this.getActions()
-        .stream()
-        .map(action -> new AutomationActionDto(action.getId(), action.getValue()))
-        .toList()
-    );
-    dto.setName(this.getName());
-    dto.setTriggers(
+    return new AutomationRuleDto(
+      this.getId(),
+      this.getName(),
       this.getTriggers()
         .stream()
         .map(trigger ->
           new AutomationTriggerDto(trigger.getId(), trigger.getValue())
         )
+        .toList(),
+      this.getActions()
+        .stream()
+        .map(action ->
+          new AutomationActionDto(action.getId(), action.getValue())
+        )
         .toList()
     );
-    return dto;
   }
 
   @Override
@@ -111,12 +108,12 @@ public class AutomationRule {
 
   @Override
   public boolean equals(Object o) {
-      return AutomationRuleObject.equals(this, o);
+    return AutomationRuleObject.equals(this, o);
   }
 
   @Override
   public int hashCode() {
-      return AutomationRuleObject.hashCode(this);
+    return AutomationRuleObject.hashCode(this);
   }
 
   public String getRecipientId() {

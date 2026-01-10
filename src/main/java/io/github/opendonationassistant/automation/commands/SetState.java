@@ -82,7 +82,7 @@ public class SetState extends BaseController {
         final Optional<AutomationVariableDto> updatedVariable = command
           .variables()
           .stream()
-          .filter(updated -> updated.getId().equals(it.getId()))
+          .filter(updated -> updated.id().equals(it.getId()))
           .findAny();
         updatedVariable.ifPresentOrElse(
           newValue -> {
@@ -97,25 +97,25 @@ public class SetState extends BaseController {
       .filter(it ->
         existingVariables
           .stream()
-          .filter(oldValue -> oldValue.getId().equals(it.getId()))
+          .filter(oldValue -> oldValue.getId().equals(it.id()))
           .findAny()
           .isEmpty()
       )
       .forEach(valueToCreate -> {
-        switch (valueToCreate.getType()) {
+        switch (valueToCreate.type()) {
           case "string" -> variables.create(
             recipientId,
             "string",
-            valueToCreate.getId(),
-            valueToCreate.getName(),
-            valueToCreate.getValue()
+            valueToCreate.id(),
+            valueToCreate.name(),
+            valueToCreate.value()
           );
           case "number" -> variables.create(
             recipientId,
             "number",
-            valueToCreate.getId(),
-            valueToCreate.getName(),
-            valueToCreate.getValue()
+            valueToCreate.id(),
+            valueToCreate.name(),
+            valueToCreate.value()
           );
           default -> {}
         }
@@ -132,7 +132,7 @@ public class SetState extends BaseController {
         final Optional<AutomationRuleDto> updatedRule = command
           .rules()
           .stream()
-          .filter(it -> it.getId().equals(rule.getId()))
+          .filter(it -> it.id().equals(rule.getId()))
           .findAny();
         updatedRule.ifPresentOrElse(
           updated -> updated.asDomain(recipientId, ruleDataRepository).save(),
@@ -145,21 +145,21 @@ public class SetState extends BaseController {
       .filter(rule ->
         existingRules
           .stream()
-          .filter(it -> it.getId().equals(rule.getId()))
+          .filter(it -> it.getId().equals(rule.id()))
           .findAny()
           .isEmpty()
       )
       .forEach(rule ->
         rules.create(
           recipientId,
-          rule.getId(),
-          rule.getName(),
+          rule.id(),
+          rule.name(),
           rule
-            .getTriggers()
+            .triggers()
             .stream()
             .map(AutomationTriggerDto::asDomain)
             .toList(),
-          rule.getActions().stream().map(AutomationActionDto::asDomain).toList()
+          rule.actions().stream().map(AutomationActionDto::asDomain).toList()
         )
       );
   }

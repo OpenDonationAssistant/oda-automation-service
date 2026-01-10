@@ -8,9 +8,9 @@ import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.commons.Amount;
 import io.github.opendonationassistant.commons.logging.ODALogger;
-import io.github.opendonationassistant.events.goal.GoalSender;
-import io.github.opendonationassistant.events.goal.GoalSender.Stage;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
+import io.github.opendonationassistant.events.goal.UpdatedGoalSender;
+import io.github.opendonationassistant.events.goal.UpdatedGoalSender.Stage;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
@@ -25,14 +25,14 @@ public class GoalListener {
   private final AutomationRuleRepository ruleRepository;
   private final TriggerFactory triggerFactory;
   private final ActionFactory actionFactory;
-  private final GoalSender goalSender;
+  private final UpdatedGoalSender goalSender;
 
   @Inject
   public GoalListener(
     AutomationRuleRepository ruleRepository,
     TriggerFactory triggerFactory,
     ActionFactory actionFactory,
-    GoalSender goalSender
+    UpdatedGoalSender goalSender
   ) {
     this.triggerFactory = triggerFactory;
     this.actionFactory = actionFactory;
@@ -46,10 +46,7 @@ public class GoalListener {
       updated.recipientId()
     );
 
-    log.info(
-      "Handling UpdatedGoal",
-      Map.of("goal", updated, "rules", rules)
-    );
+    log.info("Handling UpdatedGoal", Map.of("goal", updated, "rules", rules));
 
     var goal = new Goal(
       updated.goalId(),
@@ -120,12 +117,14 @@ public class GoalListener {
   }
 
   private boolean checkHasChanges(Goal origin, Goal updated) {
-    boolean accumulatedChanged =
-      updated.getAccumulatedAmount().getMajor() !=
-      origin.getAccumulatedAmount().getMajor();
-    boolean requiredChanged =
-      updated.getRequiredAmount().getMajor() !=
-      origin.getRequiredAmount().getMajor();
+    boolean accumulatedChanged = !updated
+      .getAccumulatedAmount()
+      .getMajor()
+      .equals(origin.getAccumulatedAmount().getMajor());
+    boolean requiredChanged = !updated
+      .getRequiredAmount()
+      .getMajor()
+      .equals(origin.getRequiredAmount().getMajor());
     return (accumulatedChanged || requiredChanged);
   }
 

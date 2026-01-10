@@ -9,8 +9,6 @@ import jakarta.annotation.Nullable;
 
 public class AutomationStringVariable extends AutomationVariable<String> {
 
-  private String value;
-
   public AutomationStringVariable(
     @Nonnull String recipientId,
     @Nonnull String id,
@@ -18,16 +16,15 @@ public class AutomationStringVariable extends AutomationVariable<String> {
     @Nullable String value,
     @Nonnull AutomationVariableDataRepository repository
   ) {
-    super(recipientId, id, name, repository);
-    this.value = value == null ? "" : value;
+    super(recipientId, id, name, value == null ? "" : value, repository);
   }
 
   protected AutomationVariableData extractData() {
     return new AutomationVariableData(
-      this.getRecipientId(),
-      "string",
       this.getId(),
+      "string",
       this.getName(),
+      this.getRecipientId(),
       this.getValue()
     );
   }
@@ -39,13 +36,5 @@ public class AutomationStringVariable extends AutomationVariable<String> {
       "string",
       this.getValue()
     );
-  }
-
-  public String getValue() {
-    return value;
-  }
-
-  public void setValue(String value) {
-    this.value = value;
   }
 }

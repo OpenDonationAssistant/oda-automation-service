@@ -1,8 +1,6 @@
 package io.github.opendonationassistant.automation.repository;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationRule;

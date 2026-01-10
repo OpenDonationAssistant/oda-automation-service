@@ -1,6 +1,5 @@
 package io.github.opendonationassistant.automation.repository;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.opendonationassistant.automation.AutomationVariable;
@@ -45,13 +44,13 @@ public class AutomationVariableRepositoryTest {
       null
     );
 
-    assertThat(createdString.getId()).isNotBlank();
-    assertThat(createdString.getRecipientId()).isEqualTo(recipientId);
-    assertThat(createdString.getValue()).isEqualTo("");
+    assertFalse(createdString.getId().isBlank());
+    assertEquals(recipientId, createdString.getRecipientId());
+    assertEquals("", createdString.getValue());
 
-    assertThat(createdNumber.getId()).isNotBlank();
-    assertThat(createdNumber.getRecipientId()).isEqualTo(recipientId);
-    assertThat(createdNumber.getValue()).isEqualTo(BigDecimal.ZERO);
+    assertFalse(createdNumber.getId().isBlank());
+    assertEquals(recipientId, createdNumber.getRecipientId());
+    assertEquals(BigDecimal.ZERO, createdNumber.getValue());
   }
 
   @Test
@@ -69,9 +68,9 @@ public class AutomationVariableRepositoryTest {
       value
     );
     log.debug("created string variable: {}", createdString);
-    assertThat(createdString.getId()).isEqualTo(variableId);
-    assertThat(createdString.getRecipientId()).isEqualTo(recipientId);
-    assertThat(createdString.getValue()).isEqualTo(value);
+    assertEquals(variableId, createdString.getId());
+    assertEquals(recipientId, createdString.getRecipientId());
+    assertEquals(value, createdString.getValue());
   }
 
   @Test
@@ -93,10 +92,10 @@ public class AutomationVariableRepositoryTest {
     );
     assertTrue(updatedString.isPresent());
     final AutomationVariable<?> updated = updatedString.get();
-    assertThat(updated.getRecipientId()).isEqualTo(recipientId);
-    assertThat(updated.getId()).isEqualTo(createdString.getId());
-    assertThat(updated.getName()).isEqualTo(newName);
-    assertThat(updated.getValue()).isEqualTo(newValue);
+    assertEquals(recipientId, updated.getRecipientId());
+    assertEquals(createdString.getId(), updated.getId());
+    assertEquals(newName, updated.getName());
+    assertEquals(newValue, updated.getValue());
   }
 
   @Test

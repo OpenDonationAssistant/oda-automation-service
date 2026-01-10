@@ -4,6 +4,7 @@ import com.fasterxml.uuid.Generators;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.micronaut.core.util.StringUtils;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
@@ -11,16 +12,13 @@ import jakarta.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Singleton
 public class AutomationVariableRepository {
 
-  private Logger log = LoggerFactory.getLogger(
-    AutomationVariableRepository.class
-  );
+  private final ODALogger log = new ODALogger(this);
   private AutomationVariableDataRepository repository;
 
   @Inject
@@ -63,18 +61,15 @@ public class AutomationVariableRepository {
     String variableValue
   ) {
     var data = new AutomationVariableData(
-      recipientId,
-      type,
       variableId,
+      type,
       Optional.ofNullable(variableName).orElse("<Без названия>"),
+      recipientId,
       Optional.ofNullable(variableValue).orElse("")
     );
-    final Optional<AutomationVariableData> existing =
-      repository.getByRecipientIdAndId(recipientId, variableId);
-    if (existing.isEmpty()) {}
-    repository.save(data);
+    repository.update(data);
     final AutomationVariable<?> created = convert(data);
-    log.debug("created variable: {}", created);
+    log.debug("Updated variable", Map.of("variable", created));
     return created;
   }
 
@@ -89,45 +84,45 @@ public class AutomationVariableRepository {
       Generators.timeBasedEpochGenerator().generate().toString()
     );
     var data = new AutomationVariableData(
-      recipientId,
-      type,
       id,
+      type,
       Optional.ofNullable(variableName).orElse("<Без названия>"),
+      recipientId,
       Optional.ofNullable(variableValue).orElse("")
     );
     repository.save(data);
     final AutomationVariable<?> created = convert(data);
-    log.debug("created variable: {}", created);
+    log.debug("Created variable", Map.of("variable", created));
     return created;
   }
 
   private AutomationVariable<?> convert(AutomationVariableData it) {
-    if ("string".equals(it.getType())) {
-      return new AutomationStringVariable(
-        it.getRecipientId(),
-        it.getId(),
-        it.getName(),
-        it.getValue(),
-        repository
-      );
-    }
-    if ("number".equals(it.getType())) {
-      return new AutomationNumberVariable(
-        it.getRecipientId(),
-        it.getId(),
-        it.getName(),
-        Optional.ofNullable(it.getValue())
+    return switch (it.type()) {
+      case "number" -> new AutomationNumberVariable(
+        it.recipientId(),
+        it.id(),
+        it.name(),
+        Optional.ofNullable(it.value())
           .filter(StringUtils::isNotEmpty)
           .map(BigDecimal::new)
           .orElse(BigDecimal.ZERO),
         repository
       );
-    }
-    return new AutomationVariable<String>(
-      it.getRecipientId(),
-      it.getId(),
-      it.getName(),
-      repository
-    );
+      case "string" -> new AutomationStringVariable(
+        it.recipientId(),
+        it.id(),
+        it.name(),
+        it.value(),
+        repository
+      );
+      default -> new AutomationVariable<String>(
+        it.recipientId(),
+        it.id(),
+        it.name(),
+        it.value(),
+        repository
+      );
+    };
   }
+
 }
