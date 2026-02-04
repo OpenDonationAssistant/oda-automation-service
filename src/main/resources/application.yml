@@ -10,8 +10,19 @@ micronaut:
           jwks:
             keycloak:
               url: https://auth.oda.digital/realms/ODA/protocol/openid-connect/certs
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        enabled: true
+        step: PT1M
   http.services.widgets.url: http://widgets-service
 flyway:
   datasources:
     default:
       enabled: true
+endpoints:
+  prometheus:
+    sensitive: false
+  metrics:
+    sensitive: false

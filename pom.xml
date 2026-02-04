@@ -3,18 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.opendonationassistant</groupId>
   <artifactId>oda-automation-service</artifactId>
-  <version>0.2</version>
+  <version>0.2.0</version>
   <packaging>${packaging}</packaging>
   <parent>
     <groupId>io.micronaut.platform</groupId>
     <artifactId>micronaut-parent</artifactId>
-    <version>4.10.2</version>
+    <version>4.10.6</version>
   </parent>
   <properties>
     <packaging>jar</packaging>
-    <jdk.version>21</jdk.version>
-    <release.version>21</release.version>
-    <micronaut.version>4.10.2</micronaut.version>
+    <jdk.version>25</jdk.version>
+    <release.version>25</release.version>
     <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
     <micronaut.runtime>netty</micronaut.runtime>
     <micronaut.aot.enabled>false</micronaut.aot.enabled>
@@ -31,7 +30,7 @@
     <dependency>
       <groupId>io.github.opendonationassistant</groupId>
       <artifactId>oda-rabbit-conf</artifactId>
-      <version>0.9.120</version>
+      <version>0.9.131</version>
     </dependency>
     <dependency>
       <groupId>org.jspecify</groupId>
@@ -118,16 +117,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>io.micronaut.controlpanel</groupId>
-      <artifactId>micronaut-control-panel-management</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.micronaut.controlpanel</groupId>
-      <artifactId>micronaut-control-panel-ui</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>io.micronaut.testresources</groupId>
       <artifactId>micronaut-test-resources-client</artifactId>
       <scope>provided</scope>
@@ -196,6 +185,14 @@
       <artifactId>hamcrest</artifactId>
       <version>3.0</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut.micrometer</groupId>
+      <artifactId>micronaut-micrometer-registry-prometheus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.micronaut</groupId>
+      <artifactId>micronaut-management</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -299,7 +296,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${project.basedir}/target/classes/META-INF/swagger/${artifactId}-${version}.yml</inputSpec>
+              <inputSpec>${project.basedir}/target/classes/META-INF/swagger/${artifactId}-1.0.0.yml</inputSpec>
               <generatorName>typescript-axios</generatorName>
               <configurationFile>openapi-config.json</configurationFile>
               <configOptions>

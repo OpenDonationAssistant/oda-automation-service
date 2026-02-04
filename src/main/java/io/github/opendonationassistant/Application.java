@@ -16,7 +16,7 @@ import jakarta.inject.Singleton;
 @OpenAPIDefinition(
   info = @Info(
     title = "ODA Automation Service",
-    version = "0.2",
+    version = "1.0.0",
     description = "ODA Automation Service",
     license = @License(
       name = "GPL-3.0",
