@@ -30,7 +30,7 @@
     <dependency>
       <groupId>io.github.opendonationassistant</groupId>
       <artifactId>oda-rabbit-conf</artifactId>
-      <version>0.9.131</version>
+      <version>0.9.136</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
