@@ -210,8 +210,8 @@
           <!-- <useIncrementalCompilation>false</useIncrementalCompilation> -->
           <annotationProcessorPaths combine.self="override">
             <path>
-                <groupId>io.micronaut.sourcegen</groupId>
-                <artifactId>micronaut-sourcegen-generator-java</artifactId>
+              <groupId>io.micronaut.sourcegen</groupId>
+              <artifactId>micronaut-sourcegen-generator-java</artifactId>
             </path>
             <path>
               <groupId>io.micronaut</groupId>
@@ -275,7 +275,7 @@
           </compilerArgs>
         </configuration>
       </plugin>
-            <plugin>
+      <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>7.2.0</version>
@@ -295,6 +295,17 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <version>0.11.3</version>
+        <configuration>
+          <buildArgs>
+            <buildArg>--initialize-at-build-time=io.micronaut.context.ApplicationContextConfigurer$1</buildArg>
+            <buildArg>-H:+SharedArenaSupport</buildArg>
+          </buildArgs>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
