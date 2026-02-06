@@ -1,6 +1,6 @@
-FROM docker.io/library/eclipse-temurin:21-jdk-jammy
+FROM fedora:41
 LABEL org.opencontainers.image.source=https://github.com/opendonationasssistant/oda-automation-service
 WORKDIR /app
-COPY target/oda-automation-service-0.2.0.jar /app
+COPY target/oda-automation-service /app
 
-CMD ["java","--add-opens","java.base/java.time=ALL-UNNAMED","-jar","oda-automation-service-0.2.0.jar"]
+CMD ["./oda-automation-service"]
