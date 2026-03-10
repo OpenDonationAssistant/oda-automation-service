@@ -3,8 +3,10 @@ package io.github.opendonationassistant.automation.listener.messagehandlers;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import io.github.opendonationassistant.events.MessageHandler;
-import io.github.opendonationassistant.events.UIFacade;
-import io.github.opendonationassistant.events.UIFacade.Variable;
+import io.github.opendonationassistant.events.twitch.events.TwitchChannelCheerEvent;
+import io.github.opendonationassistant.events.ui.UIFacade;
+import io.github.opendonationassistant.events.ui.UIFacade.Event;
+import io.github.opendonationassistant.events.ui.UIFacade.Variable;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -32,10 +34,7 @@ public class TwitchChannelCheerEventHandler implements MessageHandler {
   @Override
   public void handle(byte[] message) throws IOException {
     var received = ObjectMapper.getDefault()
-      .readValue(
-        message,
-        io.github.opendonationassistant.events.twitch.events.TwitchChannelCheerEvent.class
-      );
+      .readValue(message, TwitchChannelCheerEvent.class);
     if (received == null) {
       return;
     }
@@ -61,11 +60,6 @@ public class TwitchChannelCheerEventHandler implements MessageHandler {
         new Variable(uuid.generate().toString(), "nickname", username, "string")
       )
     );
-    var event = new io.github.opendonationassistant.events.UIFacade.Event(
-      received.id(),
-      "TwitchChannelCheerEvent",
-      variables
-    );
-    ui.sendEvent(received.recipientId(), event);
+    ui.sendEvent(received.recipientId(), new Event(received.id(), "TwitchChannelCheerEvent", variables));
   }
 }

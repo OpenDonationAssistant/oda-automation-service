@@ -3,8 +3,10 @@ package io.github.opendonationassistant.automation.listener.messagehandlers;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import io.github.opendonationassistant.events.MessageHandler;
-import io.github.opendonationassistant.events.UIFacade;
-import io.github.opendonationassistant.events.UIFacade.Variable;
+import io.github.opendonationassistant.events.twitch.events.TwitchChannelSubscriptionGiftEvent;
+import io.github.opendonationassistant.events.ui.UIFacade;
+import io.github.opendonationassistant.events.ui.UIFacade.Variable;
+import io.github.opendonationassistant.events.ui.UIFacade.Event;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -34,12 +36,12 @@ public class TwitchChannelSubscriptionGiftEventHandler
     var received = ObjectMapper.getDefault()
       .readValue(
         message,
-        io.github.opendonationassistant.events.twitch.events.TwitchChannelSubscriptionGiftEvent.class
+        TwitchChannelSubscriptionGiftEvent.class
       );
     if (received == null) {
       return;
     }
-    var event = new io.github.opendonationassistant.events.UIFacade.Event(
+    var event = new Event(
       received.id(),
       "TwitchChannelSubscribeEvent",
       List.of(

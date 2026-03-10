@@ -4,6 +4,7 @@ import io.github.opendonationassistant.events.MessageProcessor;
 import io.micronaut.messaging.annotation.MessageHeader;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
+import io.micronaut.rabbitmq.bind.RabbitAcknowledgement;
 import jakarta.inject.Inject;
 import java.io.IOException;
 
@@ -20,9 +21,9 @@ public class EventsListener {
   @Queue(io.github.opendonationassistant.rabbit.Queue.Automation.EVENTS)
   public void checkAutomationForUpdatedGoals(
     @MessageHeader String type,
-    byte[] message
+    byte[] message,
+    RabbitAcknowledgement ack
   ) throws IOException {
-    // TODO Error and ack handling
-    processor.process(type, message);
+    processor.process(type, message, ack);
   }
 }
