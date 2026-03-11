@@ -1,3 +1,6 @@
+# ODA Automation Service
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/OpenDonationAssistant/oda-automation-service)
+
 ## Micronaut 4.7.6 Documentation
 
 - [User Guide](https://docs.micronaut.io/4.7.6/guide/index.html)
