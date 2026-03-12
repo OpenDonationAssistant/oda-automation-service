@@ -2,7 +2,8 @@ package io.github.opendonationassistant.automation.listener.messagehandlers;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
-import io.github.opendonationassistant.events.MessageHandler;
+
+import io.github.opendonationassistant.events.AbstractMessageHandler;
 import io.github.opendonationassistant.events.twitch.events.TwitchChannelSubscriptionGiftEvent;
 import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Variable;
@@ -15,33 +16,21 @@ import java.util.List;
 
 @Singleton
 public class TwitchChannelSubscriptionGiftEventHandler
-  implements MessageHandler {
+  extends AbstractMessageHandler<TwitchChannelSubscriptionGiftEvent> {
 
   private final UIFacade ui;
   private final TimeBasedEpochGenerator uuid =
     Generators.timeBasedEpochGenerator();
 
   @Inject
-  public TwitchChannelSubscriptionGiftEventHandler(UIFacade ui) {
+  public TwitchChannelSubscriptionGiftEventHandler(UIFacade ui, ObjectMapper mapper) {
+    super(mapper);
     this.ui = ui;
   }
 
   @Override
-  public String type() {
-    return "TwitchChannelSubscriptionGiftEvent";
-  }
-
-  @Override
-  public void handle(byte[] message) throws IOException {
-    var received = ObjectMapper.getDefault()
-      .readValue(
-        message,
-        TwitchChannelSubscriptionGiftEvent.class
-      );
-    if (received == null) {
-      return;
-    }
-    var event = new Event(
+  public void handle(TwitchChannelSubscriptionGiftEvent received) throws IOException {
+   var event = new Event(
       received.id(),
       "TwitchChannelSubscribeEvent",
       List.of(

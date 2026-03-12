@@ -2,7 +2,7 @@ package io.github.opendonationassistant.automation.listener.messagehandlers;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
-import io.github.opendonationassistant.events.MessageHandler;
+import io.github.opendonationassistant.events.AbstractMessageHandler;
 import io.github.opendonationassistant.events.twitch.events.TwitchChannelCheerEvent;
 import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Event;
@@ -15,29 +15,21 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Singleton
-public class TwitchChannelCheerEventHandler implements MessageHandler {
+public class TwitchChannelCheerEventHandler
+  extends AbstractMessageHandler<TwitchChannelCheerEvent> {
 
   private final UIFacade ui;
   private final TimeBasedEpochGenerator uuid =
     Generators.timeBasedEpochGenerator();
 
   @Inject
-  public TwitchChannelCheerEventHandler(UIFacade ui) {
+  public TwitchChannelCheerEventHandler(UIFacade ui, ObjectMapper mapper) {
+    super(mapper);
     this.ui = ui;
   }
 
   @Override
-  public String type() {
-    return "TwitchChannelCheerEvent";
-  }
-
-  @Override
-  public void handle(byte[] message) throws IOException {
-    var received = ObjectMapper.getDefault()
-      .readValue(message, TwitchChannelCheerEvent.class);
-    if (received == null) {
-      return;
-    }
+  public void handle(TwitchChannelCheerEvent received) throws IOException {
     var variables = new ArrayList<Variable>();
     variables.add(
       new Variable(
@@ -60,6 +52,9 @@ public class TwitchChannelCheerEventHandler implements MessageHandler {
         new Variable(uuid.generate().toString(), "nickname", username, "string")
       )
     );
-    ui.sendEvent(received.recipientId(), new Event(received.id(), "TwitchChannelCheerEvent", variables));
+    ui.sendEvent(
+      received.recipientId(),
+      new Event(received.id(), "TwitchChannelCheerEvent", variables)
+    );
   }
 }
