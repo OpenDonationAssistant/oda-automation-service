@@ -1,5 +1,7 @@
 package io.github.opendonationassistant.automation.listener;
 
+import static io.github.opendonationassistant.rabbit.Queue.Automation.EVENTS;
+
 import io.github.opendonationassistant.events.MessageProcessor;
 import io.micronaut.messaging.annotation.MessageHeader;
 import io.micronaut.rabbitmq.annotation.Queue;
@@ -18,7 +20,7 @@ public class EventsListener {
     this.processor = processor;
   }
 
-  @Queue(io.github.opendonationassistant.rabbit.Queue.Automation.EVENTS)
+  @Queue(EVENTS)
   public void checkAutomationForUpdatedGoals(
     @MessageHeader String type,
     byte[] message,

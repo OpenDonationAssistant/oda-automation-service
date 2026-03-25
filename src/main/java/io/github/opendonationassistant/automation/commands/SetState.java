@@ -1,5 +1,6 @@
 package io.github.opendonationassistant.automation.commands;
 
+import io.github.opendonationassistant.automation.api.SetStateApi;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.dto.AutomationActionDto;
@@ -15,10 +16,7 @@ import io.github.opendonationassistant.commons.micronaut.BaseController;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Post;
-import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
-import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -30,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 @Controller
-public class SetState extends BaseController {
+public class SetState extends BaseController implements SetStateApi {
 
   private Logger log = LoggerFactory.getLogger(SetState.class);
 
@@ -52,8 +50,6 @@ public class SetState extends BaseController {
     this.ruleDataRepository = ruleDataRepository;
   }
 
-  @Post("/automation/commands/setstate")
-  @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<Void> setState(
     Authentication auth,
     @Body SetStateCommand command

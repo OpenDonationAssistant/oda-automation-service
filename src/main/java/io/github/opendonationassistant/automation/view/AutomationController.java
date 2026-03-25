@@ -1,5 +1,6 @@
 package io.github.opendonationassistant.automation.view;
 
+import io.github.opendonationassistant.automation.api.AutomationOperationsApi;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.dto.AutomationDto;
@@ -10,14 +11,12 @@ import io.github.opendonationassistant.automation.repository.AutomationVariableR
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
-import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
-import io.micronaut.security.rules.SecurityRule;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
-public class AutomationController {
+public class AutomationController implements AutomationOperationsApi {
 
   private AutomationVariableRepository variables;
   private AutomationRuleRepository rules;
@@ -30,8 +29,6 @@ public class AutomationController {
     this.rules = rules;
   }
 
-  @Get("/automation/variables")
-  @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<List<AutomationVariableDto>> listVariables(
     Authentication auth
   ) {
@@ -49,7 +46,6 @@ public class AutomationController {
   }
 
   @Get("/automation/rules")
-  @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<List<AutomationRuleDto>> listAutomations(
     Authentication auth
   ) {
@@ -67,7 +63,6 @@ public class AutomationController {
   }
 
   @Get("/automation/")
-  @Secured(SecurityRule.IS_AUTHENTICATED)
   public HttpResponse<AutomationDto> getState(Authentication auth) {
     final Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -86,12 +81,6 @@ public class AutomationController {
           .map(AutomationVariable::asDto)
           .toList()
       )
-    );
-  }
-
-  private Optional<String> getOwnerId(Authentication auth) {
-    return Optional.ofNullable(
-      String.valueOf(auth.getAttributes().get("preferred_username"))
     );
   }
 }
