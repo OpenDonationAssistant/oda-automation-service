@@ -6,8 +6,11 @@ import io.github.opendonationassistant.alert.repository.AlertRepository;
 import io.github.opendonationassistant.events.AbstractMessageHandler;
 import io.github.opendonationassistant.events.payments.PaymentEvent;
 import io.micronaut.serde.ObjectMapper;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 
+@Singleton
 public class PaymentEventHandler extends AbstractMessageHandler<PaymentEvent> {
 
   private final AlertRepository repository;
