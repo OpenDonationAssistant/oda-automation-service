@@ -1,6 +1,5 @@
 package io.github.opendonationassistant.alert.repository;
 
-import com.fasterxml.uuid.Generators;
 import io.github.opendonationassistant.commons.Amount;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
@@ -15,14 +14,4 @@ public record AlertData(
   @Nullable String nickname,
   @Nullable String message,
   @Nullable Amount amount
-) {
-  public AlertData(String type, String recipientId) {
-    this(
-      Generators.timeBasedEpochGenerator().generate().toString(),
-      recipientId,
-      null,
-      null,
-      null
-    );
-  }
-}
+) {}
