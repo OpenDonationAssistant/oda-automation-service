@@ -1,4 +1,4 @@
-package io.github.opendonationassistant.automation.listener.messagehandlers;
+package io.github.opendonationassistant.automation.listener.messagehandlers.twitch;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;

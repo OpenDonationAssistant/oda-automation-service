@@ -1,9 +1,9 @@
-package io.github.opendonationassistant.automation.listener.messagehandlers;
+package io.github.opendonationassistant.automation.listener.messagehandlers.twitch;
 
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import io.github.opendonationassistant.events.AbstractMessageHandler;
-import io.github.opendonationassistant.events.twitch.events.TwitchChannelRaidEvent;
+import io.github.opendonationassistant.events.twitch.events.TwitchChannelSubscribeEvent;
 import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Event;
 import io.github.opendonationassistant.events.ui.UIFacade.Variable;
@@ -14,35 +14,46 @@ import java.io.IOException;
 import java.util.List;
 
 @Singleton
-public class TwitchChannelRaidEventHandler
-  extends AbstractMessageHandler<TwitchChannelRaidEvent> {
+public class TwitchChannelSubscribeEventHandler
+  extends AbstractMessageHandler<TwitchChannelSubscribeEvent> {
 
   private final UIFacade ui;
   private final TimeBasedEpochGenerator uuid =
     Generators.timeBasedEpochGenerator();
 
   @Inject
-  public TwitchChannelRaidEventHandler(UIFacade ui, ObjectMapper mapper) {
+  public TwitchChannelSubscribeEventHandler(UIFacade ui, ObjectMapper mapper) {
     super(mapper);
     this.ui = ui;
   }
 
-  public void handle(TwitchChannelRaidEvent received) throws IOException {
+  @Override
+  public void handle(TwitchChannelSubscribeEvent received) throws IOException {
+    if (received.isGift()) {
+      // TODO use config
+      return;
+    }
     var event = new Event(
       received.id(),
-      "TwitchChannelRaidEvent",
+      "TwitchChannelSubscribeEvent",
       List.of(
         new Variable(
           uuid.generate().toString(),
-          "channel",
-          received.fromChannelName(),
+          "nickname",
+          received.username(),
           "string"
         ),
         new Variable(
           uuid.generate().toString(),
-          "viewerCount",
-          received.viewerCount(),
+          "tier",
+          Integer.parseInt(received.tier()),
           "number"
+        ),
+        new Variable(
+          uuid.generate().toString(),
+          "isGift",
+          received.isGift(),
+          "boolean"
         )
       )
     );

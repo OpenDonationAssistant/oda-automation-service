@@ -3,6 +3,7 @@ package io.github.opendonationassistant.alert.repository;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import io.github.opendonationassistant.events.alerts.AlertNotification;
+import io.github.opendonationassistant.events.alerts.AlertNotification.AlertMedia;
 import io.github.opendonationassistant.events.alerts.AlertSender;
 import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Event;
@@ -52,10 +53,11 @@ public class Alert {
         data.message(),
         data.recipientId(),
         data.amount(),
-        null, // alertmedia
+        new AlertMedia(data.media().url()), // alertmedia
         Optional.ofNullable(link).map(AlertLink::source).orElse("manual")
       )
     );
+
     var variables = new ArrayList<Variable>();
     Optional.ofNullable(data.nickname()).ifPresent(nickname ->
       variables.add(
@@ -68,6 +70,14 @@ public class Alert {
       .ifPresent(major ->
         variables.add(
           new Variable(uuid.generate().toString(), "amount", major, "string")
+        )
+      );
+    Optional.ofNullable(data.media())
+      .map(media -> media.url())
+      .map(String::valueOf)
+      .ifPresent(url ->
+        variables.add(
+          new Variable(uuid.generate().toString(), "alertmedia", url, "string")
         )
       );
     Optional.ofNullable(data.message()).ifPresent(message ->

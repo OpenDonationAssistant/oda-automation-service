@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS alert_data (
     recipient_id VARCHAR(255) NOT NULL,
     nickname VARCHAR(255),
     message TEXT,
-    amount TEXT
+    amount TEXT,
+    media JSONB
 );
 
 CREATE TABLE IF NOT EXISTS alert_link (
