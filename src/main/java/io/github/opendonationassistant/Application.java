@@ -61,6 +61,8 @@ public class Application {
             "event.HistoryItemEvent",
             events,
             "event.GoalHistoryEvent",
+            events,
+            "event.CreateAlertCommand",
             events
           )
         ),
