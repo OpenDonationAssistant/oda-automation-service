@@ -1,4 +1,4 @@
-package io.github.opendonationassistant.automation.listener.messagehandlers;
+package io.github.opendonationassistant.automation.listener.messagehandlers.twitch;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

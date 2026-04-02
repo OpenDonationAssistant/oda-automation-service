@@ -53,7 +53,10 @@ public class Alert {
         data.message(),
         data.recipientId(),
         data.amount(),
-        new AlertMedia(data.media().url()), // alertmedia
+        Optional.ofNullable(data.media())
+          .map(it -> it.url())
+          .map(AlertMedia::new)
+          .orElse(null), // new AlertMedia(data.media().url()), // alertmedia
         Optional.ofNullable(link).map(AlertLink::source).orElse("manual")
       )
     );
