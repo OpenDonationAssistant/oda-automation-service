@@ -9,6 +9,7 @@ import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Singleton;
 import java.io.IOException;
+import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 @Singleton
@@ -35,7 +36,9 @@ public class CreateAlertCommandHandler
       message.nickname(),
       message.message(),
       message.amount(),
-      null
+      Optional.ofNullable(message.url())
+        .map(url -> new AlertData.AlertMedia(url))
+        .orElse(null)
     );
     repository.create("payment", message.paymentId(), data);
   }
