@@ -21,6 +21,8 @@ flyway:
   datasources:
     default:
       enabled: true
+      schemas: automation
+      default-schema: automation
 endpoints:
   prometheus:
     sensitive: false
