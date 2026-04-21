@@ -48,7 +48,7 @@ public class AlertRepositoryTest {
       uiFacade,
       alertSender
     );
-    Alert result = alertRepository.create("payment", originId, toSave);
+    Alert result = alertRepository.create("ODA","payment", originId, toSave);
     assertNotNull(result);
     assertNotNull(result.data());
     assertEquals(toSave, result.data());
@@ -61,7 +61,8 @@ public class AlertRepositoryTest {
     assertTrue(StringUtils.isNotEmpty(savedLink.get(0).id()));
     assertEquals(toSave.id(), savedLink.get(0).alertId());
     assertEquals(originId, savedLink.get(0).originId());
-    assertEquals("payment", savedLink.get(0).source());
+    assertEquals("ODA", savedLink.get(0).source());
+    assertEquals("payment", savedLink.get(0).event());
   }
 
   @Test

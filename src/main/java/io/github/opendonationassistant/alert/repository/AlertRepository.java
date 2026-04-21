@@ -33,13 +33,14 @@ public class AlertRepository {
     return new Alert(alert, null, alertSender, uiFacade);
   }
 
-  public Alert create(String source, String originId, AlertData alert) {
+  public Alert create(String system, String event, String originId, AlertData alert) {
     dataRepository.save(alert);
     final AlertLink alertLink = new AlertLink(
       Generators.timeBasedEpochGenerator().generate().toString(),
       alert.id(),
       originId,
-      source
+      system,
+      event
     );
     linkRepository.save(alertLink);
     return new Alert(alert, alertLink, alertSender, uiFacade);

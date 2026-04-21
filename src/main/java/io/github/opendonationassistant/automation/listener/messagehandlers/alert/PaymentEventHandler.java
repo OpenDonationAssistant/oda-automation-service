@@ -27,8 +27,10 @@ public class PaymentEventHandler extends AbstractMessageHandler<PaymentEvent> {
       message.nickname(),
       message.message(),
       message.amount(),
+      null,
+      null,
       null
     );
-    repository.create("payment", message.id(), data);
+    repository.create("ODA", "payment", message.id(), data);
   }
 }

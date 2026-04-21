@@ -16,7 +16,9 @@ public record AlertData(
   @Nullable String nickname,
   @Nullable String message,
   @Nullable Amount amount,
-  @Nullable @MappedProperty(type = DataType.JSON) AlertMedia media
+  @Nullable @MappedProperty(type = DataType.JSON) AlertMedia media,
+  @Nullable String levelName,
+  @Nullable Integer count
 ) {
   @Serdeable
   public record AlertMedia(String url) {}

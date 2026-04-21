@@ -88,6 +88,21 @@ public class Alert {
         new Variable(uuid.generate().toString(), "message", message, "string")
       )
     );
+    Optional.ofNullable(data.levelName()).ifPresent(levelname ->
+      variables.add(
+        new Variable(
+          uuid.generate().toString(),
+          "levelName",
+          levelname,
+          "string"
+        )
+      )
+    );
+    Optional.ofNullable(data.count()).ifPresent(count ->
+      variables.add(
+        new Variable(uuid.generate().toString(), "count", count, "number")
+      )
+    );
     var event = new Event(data.id(), "Alert", variables);
     ui.sendEvent(data.recipientId(), event);
   }

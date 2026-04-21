@@ -10,5 +10,6 @@ public record AlertLink(
   @Id String id,
   String alertId,
   String originId,
-  String source
+  String source,
+  String event
 ) {}

@@ -38,9 +38,16 @@ public class CreateAlertCommandHandler
       message.amount(),
       Optional.ofNullable(message.url())
         .map(url -> new AlertData.AlertMedia(url))
-        .orElse(null)
+        .orElse(null),
+      message.levelName(),
+      message.count()
     );
-    repository.create("payment", message.paymentId(), data);
+    repository.create(
+      message.system(),
+      message.event(),
+      message.paymentId(),
+      data
+    );
   }
 
   @Serdeable
@@ -50,6 +57,10 @@ public class CreateAlertCommandHandler
     String nickname,
     String message,
     Amount amount,
-    @Nullable String url
+    @Nullable String url,
+    String system,
+    String event,
+    @Nullable Integer count,
+    @Nullable String levelName
   ) {}
 }
