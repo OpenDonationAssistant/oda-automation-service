@@ -62,6 +62,16 @@ public class Alert {
     );
 
     var variables = new ArrayList<Variable>();
+    Optional.ofNullable(link).map(link -> link.source()).ifPresent(system ->
+      variables.add(
+        new Variable(uuid.generate().toString(), "system", system, "string")
+      )
+    );
+    Optional.ofNullable(link).map(link -> link.event()).ifPresent(event ->
+      variables.add(
+        new Variable(uuid.generate().toString(), "event", event, "string")
+      )
+    );
     Optional.ofNullable(data.nickname()).ifPresent(nickname ->
       variables.add(
         new Variable(uuid.generate().toString(), "nickname", nickname, "string")
