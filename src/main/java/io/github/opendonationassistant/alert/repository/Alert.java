@@ -73,7 +73,12 @@ public class Alert {
       .map(link -> link.originId())
       .ifPresent(originId ->
         variables.add(
-          new Variable(uuid.generate().toString(), "originId", originId, "string")
+          new Variable(
+            uuid.generate().toString(),
+            "originId",
+            originId,
+            "string"
+          )
         )
       );
     Optional.ofNullable(link)
