@@ -44,7 +44,7 @@ public class Alert {
     return link;
   }
 
-  public void send() {
+  public void send(boolean force) {
     sender.send(
       data.recipientId(),
       new AlertNotification(
@@ -62,6 +62,9 @@ public class Alert {
     );
 
     var variables = new ArrayList<Variable>();
+    variables.add(
+      new Variable(uuid.generate().toString(), "force", force, "boolean")
+    );
     Optional.ofNullable(link)
       .map(link -> link.source())
       .ifPresent(system ->

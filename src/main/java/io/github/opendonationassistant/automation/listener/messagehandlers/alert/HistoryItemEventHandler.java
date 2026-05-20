@@ -37,7 +37,7 @@ public class HistoryItemEventHandler
     linkRepository
       .getByOriginId(originId)
       .forEach(link -> {
-        repository.get(link.alertId()).ifPresent(Alert::send);
+        repository.get(link.alertId()).ifPresent(alert -> alert.send(false));
       });
   }
 }

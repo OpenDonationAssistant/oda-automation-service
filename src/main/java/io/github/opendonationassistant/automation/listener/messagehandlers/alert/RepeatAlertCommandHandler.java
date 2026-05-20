@@ -32,14 +32,14 @@ public class RepeatAlertCommandHandler
   @Override
   public void handle(RepeatAlertCommand message) throws IOException {
     if (message.alertId() != null) {
-      repository.get(message.alertId()).ifPresent(Alert::send);
+      repository.get(message.alertId()).ifPresent(alert -> alert.send(true));
       return;
     }
     if (message.originId() != null) {
       linkRepository
         .getByOriginId(message.originId())
         .forEach(link -> {
-          repository.get(link.alertId()).ifPresent(Alert::send);
+          repository.get(link.alertId()).ifPresent(alert -> alert.send(true));
         });
     }
   }
