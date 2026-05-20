@@ -1,8 +1,8 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
-import io.github.opendonationassistant.automation.domain.twitch.SendAndPinChatMessageCommand;
 import io.github.opendonationassistant.rabbit.RabbitClient;
+import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,4 +37,11 @@ public class PinTwitchMessageAction extends AutomationAction {
       new SendAndPinChatMessageCommand(recipientId, refreshTokenId, message)
     );
   }
+
+  @Serdeable
+  public record SendAndPinChatMessageCommand(
+    String recipientId,
+    String refreshTokenId,
+    String message
+  ) {}
 }

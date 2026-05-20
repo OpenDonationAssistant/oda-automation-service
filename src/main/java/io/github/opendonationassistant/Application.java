@@ -72,6 +72,10 @@ public class Application {
         ),
         Exchange.Exchange("payments", Map.of("event.PaymentEvent", events)),
         Exchange.Exchange("automation", Map.of("command", events)), // TODO temporary to save order
+        Exchange.Exchange(
+          "commands",
+          Map.of("command.RepeatAlertCommand", events)
+        ),
         Exchange.Exchange("changes.widgets", Map.of("*", events)),
         Exchange.Exchange(
           "goals",
