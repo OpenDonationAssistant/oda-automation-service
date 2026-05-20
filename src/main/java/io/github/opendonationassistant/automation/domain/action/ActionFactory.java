@@ -4,7 +4,9 @@ import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.automation.domain.reel.ReelCommandSender;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.Map;
 
@@ -13,14 +15,17 @@ public class ActionFactory {
 
   private final AutomationVariableRepository variables;
   private final ReelCommandSender reelCommandSender;
+  private final RabbitClient commandsRabbitClient;
 
   @Inject
   public ActionFactory(
     AutomationVariableRepository variables,
-    ReelCommandSender reelCommandSender
+    ReelCommandSender reelCommandSender,
+    @Named("commands") RabbitClient commandsRabbitClient
   ) {
     this.variables = variables;
     this.reelCommandSender = reelCommandSender;
+    this.commandsRabbitClient = commandsRabbitClient;
   }
 
   public AutomationAction create(
@@ -51,6 +56,11 @@ public class ActionFactory {
         value,
         recipientId,
         reelCommandSender
+      );
+      case "pin-twitch-message" -> new PinTwitchMessageAction(
+        id,
+        value,
+        commandsRabbitClient
       );
       default -> new AutomationAction(id, value);
     };

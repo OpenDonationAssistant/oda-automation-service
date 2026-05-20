@@ -32,7 +32,7 @@ public class TwitchChannelSubscriptionGiftEventHandler
   public void handle(TwitchChannelSubscriptionGiftEvent received) throws IOException {
    var event = new Event(
       received.id(),
-      "TwitchChannelSubscribeEvent",
+      "TwitchChannelSubscriptionGiftEvent",
       List.of(
         new Variable(
           uuid.generate().toString(),
