@@ -37,7 +37,7 @@ public class CreateAlertCommandHandler
       message.message(),
       message.amount(),
       Optional.ofNullable(message.url())
-        .map(url -> new AlertData.AlertMedia(url))
+        .map(url -> new AlertData.AlertMedia(convertUrl(url)))
         .orElse(null),
       message.levelName(),
       message.count()
@@ -48,6 +48,15 @@ public class CreateAlertCommandHandler
       message.paymentId(),
       data
     );
+  }
+
+  private String convertUrl(String url) {
+    return url
+      .replace("files.donationalerts.com", "widgets.oda.digital")
+      .replace(
+        "https://cdn.donatex.gg/donation-voices",
+        "https://widgets.oda.digital/external/donatex"
+      );
   }
 
   @Serdeable
