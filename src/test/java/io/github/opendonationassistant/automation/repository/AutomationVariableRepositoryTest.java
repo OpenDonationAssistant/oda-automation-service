@@ -3,16 +3,17 @@ package io.github.opendonationassistant.automation.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.opendonationassistant.automation.AutomationVariable;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import io.github.opendonationassistant.commons.logging.ODALogger;
 
 @MicronautTest(environments = "allinone")
 @ExtendWith(InstancioExtension.class)
@@ -32,7 +33,7 @@ public class AutomationVariableRepositoryTest {
       null,
       null
     );
-    log.debug("created string variable: {}", createdString);
+    log.debug("Created string variable", Map.of("variable", createdString));
     final AutomationVariable<?> createdNumber = repository.create(
       recipientId,
       "number",
@@ -64,7 +65,7 @@ public class AutomationVariableRepositoryTest {
       name,
       value
     );
-    log.debug("created string variable: {}", createdString);
+    log.debug("Created string variable", Map.of("variable", createdString));
     assertEquals(variableId, createdString.getId());
     assertEquals(recipientId, createdString.getRecipientId());
     assertEquals(value, createdString.getValue());
