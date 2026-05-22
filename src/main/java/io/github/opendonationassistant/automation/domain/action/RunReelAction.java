@@ -1,13 +1,9 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
-import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.automation.domain.reel.ReelCommand;
 import io.github.opendonationassistant.automation.domain.reel.ReelCommandSender;
-import io.github.opendonationassistant.automation.domain.reel.ReelWidgetCommandSender;
-import io.github.opendonationassistant.commons.Amount;
 import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,13 +36,7 @@ public class RunReelAction extends AutomationAction {
     }
     reelCommandSender.send(
       "reel",
-      new ReelCommand(
-        "select",
-        "",
-        reelId,
-        "",
-        recipientId
-      )
+      new ReelCommand("select", "", reelId, "", recipientId)
     );
   }
 }

@@ -62,6 +62,11 @@ public class ActionFactory {
         value,
         commandsRabbitClient
       );
+      case "twitch-shoutout" -> new TwitchShoutoutAction(
+        id,
+        value,
+        commandsRabbitClient
+      );
       default -> new AutomationAction(id, value);
     };
   }
