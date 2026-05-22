@@ -1,15 +1,14 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.serde.annotation.Serdeable;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PinTwitchMessageAction extends AutomationAction {
 
-  private Logger log = LoggerFactory.getLogger(PinTwitchMessageAction.class);
+  private final ODALogger log = new ODALogger(this);
   private final RabbitClient rabbitClient;
 
   public PinTwitchMessageAction(
@@ -26,9 +25,8 @@ public class PinTwitchMessageAction extends AutomationAction {
     final String refreshTokenId = (String) getValue().get("refreshTokenId");
     final String message = (String) getValue().get("message");
     log.info(
-      "Executing PinTwitchMessageAction, recipientId: {}, refreshTokenId: {}",
-      recipientId,
-      refreshTokenId
+      "Executing PinTwitchMessageAction",
+      Map.of("recipientId", recipientId, "refreshTokenId", refreshTokenId)
     );
     if (recipientId == null || refreshTokenId == null || message == null) {
       return;

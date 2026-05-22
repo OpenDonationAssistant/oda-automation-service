@@ -3,14 +3,13 @@ package io.github.opendonationassistant.automation.domain.action;
 import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.commons.Amount;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RefreshDonationGoalAction extends AutomationAction {
 
-  private Logger log = LoggerFactory.getLogger(RefreshDonationGoalAction.class);
+  private final ODALogger log = new ODALogger(this);
 
   private final Goal goal;
 
@@ -30,10 +29,16 @@ public class RefreshDonationGoalAction extends AutomationAction {
     diff = diff > 0 ? diff : 0;
     log.info(
       "Executing RefreshDonationGoalAction: {}, goal: {}, current amount: {}, diff: {}",
-      getWidgetId(),
-      goal.getRequiredAmount().getMajor(),
-      goal.getAccumulatedAmount().getMajor(),
-      diff
+      Map.of(
+        "widgetId",
+        getWidgetId(),
+        "requiredAmount",
+        goal.getRequiredAmount().getMajor(),
+        "accumulatedAmount",
+        goal.getAccumulatedAmount().getMajor(),
+        "diff",
+        diff
+      )
     );
     goal.setAccumulatedAmount(new Amount(diff, 0, "RUB"));
   }

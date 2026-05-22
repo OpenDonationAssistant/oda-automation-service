@@ -12,16 +12,13 @@ import org.instancio.junit.InstancioExtension;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 
 @MicronautTest(environments = "allinone")
 @ExtendWith(InstancioExtension.class)
 public class AutomationVariableRepositoryTest {
 
-  private Logger log = LoggerFactory.getLogger(
-    AutomationVariableRepositoryTest.class
-  );
+  private ODALogger log = new ODALogger(AutomationVariableRepositoryTest.class);
 
   @Inject
   AutomationVariableRepository repository;

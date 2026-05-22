@@ -4,17 +4,18 @@ import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationVariableData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.micronaut.serde.ObjectMapper;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
+
+import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Serdeable
 @EqualsAndHashCode
 public class AutomationVariable<T> {
 
-  private Logger log = LoggerFactory.getLogger(AutomationVariable.class);
+  private final ODALogger log = new ODALogger(this);
 
   private String recipientId;
   private String id;
@@ -48,7 +49,7 @@ public class AutomationVariable<T> {
 
   public void save() {
     final AutomationVariableData updated = extractData();
-    log.debug("updating variable to {}", updated);
+    log.debug("Updating variable", Map.of("updated", updated));
     repository.update(updated);
   }
 

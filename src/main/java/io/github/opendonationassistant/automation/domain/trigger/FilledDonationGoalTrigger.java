@@ -2,14 +2,13 @@ package io.github.opendonationassistant.automation.domain.trigger;
 
 import io.github.opendonationassistant.automation.AutomationTrigger;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.Map;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FilledDonationGoalTrigger extends AutomationTrigger {
 
-  private Logger log = LoggerFactory.getLogger(FilledDonationGoalTrigger.class);
+  private final ODALogger log = new ODALogger(this);
 
   public FilledDonationGoalTrigger(Map<String, Object> value) {
     super("donationgoal-filled", value);
@@ -25,10 +24,15 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
       return false;
     }
     log.info(
-      "FilledDonationGoalTrigger is checking goal {}, widget {}, recipient {}",
-      updatedGoal.getGoalId(),
-      updatedGoal.getWidgetId(),
-      updatedGoal.getRecipientId()
+      "check FilledDonationGoalTrigger",
+      Map.of(
+        "goal",
+        updatedGoal,
+        "widgetId",
+        getWidgetId().get(),
+        "recipientId",
+        updatedGoal.getRecipientId()
+      )
     );
 
     boolean isTriggered =
@@ -37,11 +41,17 @@ public class FilledDonationGoalTrigger extends AutomationTrigger {
         updatedGoal.getRequiredAmount().getMajor());
 
     log.info(
-      "FilledDonationGoalTrigger is triggered for goal {} , widgetId {}, with required {} and collected {}",
-      updatedGoal.getGoalId(),
-      getWidgetId().get(),
-      updatedGoal.getRequiredAmount().getMajor(),
-      updatedGoal.getAccumulatedAmount().getMajor()
+      "FilledDonationGoalTrigger is triggered",
+      Map.of(
+        "goal",
+        updatedGoal.getGoalId(),
+        "widgetId",
+        getWidgetId().get(),
+        "requiredAmount",
+        updatedGoal.getRequiredAmount().getMajor(),
+        "accumulatedAmount",
+        updatedGoal.getAccumulatedAmount().getMajor()
+      )
     );
 
     return isTriggered;

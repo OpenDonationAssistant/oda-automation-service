@@ -1,8 +1,8 @@
 package io.github.opendonationassistant.automation.commands;
 
-import io.github.opendonationassistant.automation.api.SetStateApi;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
+import io.github.opendonationassistant.automation.api.SetStateApi;
 import io.github.opendonationassistant.automation.dto.AutomationActionDto;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
 import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
@@ -11,7 +11,7 @@ import io.github.opendonationassistant.automation.repository.AutomationRuleDataR
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
-import io.github.opendonationassistant.commons.ToString;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
@@ -23,14 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-
 @Controller
 public class SetState extends BaseController implements SetStateApi {
 
-  private Logger log = LoggerFactory.getLogger(SetState.class);
+  private final ODALogger log = new ODALogger(this);
 
   private AutomationVariableRepository variables;
   private AutomationRuleRepository rules;
@@ -58,11 +54,10 @@ public class SetState extends BaseController implements SetStateApi {
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
-    MDC.put(
-      "context",
-      ToString.asJson(Map.of("command", command, "recipientId", ownerId.get()))
+    log.info(
+      "Processing SetState",
+      Map.of("command", command, "recipientId", ownerId.get())
     );
-    log.info("Processing SetState");
 
     updateVariables(ownerId.get(), command);
     updateRules(ownerId.get(), command);
@@ -150,11 +145,7 @@ public class SetState extends BaseController implements SetStateApi {
           recipientId,
           rule.id(),
           rule.name(),
-          rule
-            .triggers()
-            .stream()
-            .map(AutomationTriggerDto::asDomain)
-            .toList(),
+          rule.triggers().stream().map(AutomationTriggerDto::asDomain).toList(),
           rule.actions().stream().map(AutomationActionDto::asDomain).toList()
         )
       );
