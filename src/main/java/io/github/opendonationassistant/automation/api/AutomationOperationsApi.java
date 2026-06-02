@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
-@Tag(name = "Automation", description = "Automation operations for managing rules and variables")
+@Tag(
+  name = "Automation",
+  description = "Automation operations for managing rules and variables"
+)
 public interface AutomationOperationsApi {
-
   @Get("/automation/variables")
   @Operation(
     summary = "List automation variables",

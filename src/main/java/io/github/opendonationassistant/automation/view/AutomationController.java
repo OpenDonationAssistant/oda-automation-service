@@ -1,10 +1,12 @@
 package io.github.opendonationassistant.automation.view;
 
-import io.github.opendonationassistant.automation.api.AutomationOperationsApi;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
+import io.github.opendonationassistant.automation.api.AutomationOperationsApi;
+import io.github.opendonationassistant.automation.dto.AutomationActionDto;
 import io.github.opendonationassistant.automation.dto.AutomationDto;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
+import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
@@ -40,7 +42,7 @@ public class AutomationController implements AutomationOperationsApi {
       variables
         .listByRecipientId(ownerId.get())
         .stream()
-        .map(AutomationVariable::asDto)
+        .map(this::convert)
         .toList()
     );
   }
@@ -57,7 +59,35 @@ public class AutomationController implements AutomationOperationsApi {
       rules
         .listByRecipientId(ownerId.get())
         .stream()
-        .map(AutomationRule::asDto)
+        .map(this::convert)
+        .toList()
+    );
+  }
+
+  private AutomationVariableDto convert(AutomationVariable<?> variable) {
+    return new AutomationVariableDto(
+      variable.data().id(),
+      variable.data().name(),
+      variable.data().type(),
+      variable.data().value()
+    );
+  }
+
+  private AutomationRuleDto convert(AutomationRule rule) {
+    return new AutomationRuleDto(
+      rule.data().id(),
+      rule.data().name(),
+      rule
+        .data()
+        .triggers()
+        .stream()
+        .map(trigger -> new AutomationTriggerDto(trigger.id(), trigger.value()))
+        .toList(),
+      rule
+        .data()
+        .actions()
+        .stream()
+        .map(action -> new AutomationActionDto(action.id(), action.value()))
         .toList()
     );
   }
@@ -73,12 +103,12 @@ public class AutomationController implements AutomationOperationsApi {
         rules
           .listByRecipientId(ownerId.get())
           .stream()
-          .map(AutomationRule::asDto)
+          .map(this::convert)
           .toList(),
         variables
           .listByRecipientId(ownerId.get())
           .stream()
-          .map(AutomationVariable::asDto)
+          .map(this::convert)
           .toList()
       )
     );

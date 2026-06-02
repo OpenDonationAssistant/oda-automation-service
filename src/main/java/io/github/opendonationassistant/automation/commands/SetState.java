@@ -1,14 +1,22 @@
 package io.github.opendonationassistant.automation.commands;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.api.SetStateApi;
-import io.github.opendonationassistant.automation.dto.AutomationActionDto;
+import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
+import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
-import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
+import io.github.opendonationassistant.automation.repository.AutomationRuleData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
+import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.commons.logging.ODALogger;
@@ -19,9 +27,6 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Controller
 public class SetState extends BaseController implements SetStateApi {
@@ -69,48 +74,50 @@ public class SetState extends BaseController implements SetStateApi {
       variables.listByRecipientId(recipientId);
     existingVariables
       .stream()
-      .forEach(it -> {
-        final Optional<AutomationVariableDto> updatedVariable = command
+      .forEach(existing -> {
+        final Optional<AutomationVariableDto> variableToUpdate = command
           .variables()
           .stream()
-          .filter(updated -> updated.id().equals(it.getId()))
+          .filter(update -> update.id().equals(existing.data().id()))
           .findAny();
-        updatedVariable.ifPresentOrElse(
+        variableToUpdate.ifPresentOrElse(
           newValue -> {
-            newValue.asDomain(recipientId, variableDataRepository).save();
+            if (existing instanceof AutomationStringVariable) {
+              ((AutomationStringVariable) existing).update(
+                  newValue.name(),
+                  newValue.value()
+                );
+            }
+            if (existing instanceof AutomationNumberVariable) {
+              ((AutomationNumberVariable) existing).update(
+                  newValue.name(),
+                  new BigDecimal(newValue.value())
+                );
+            }
           },
-          () -> it.delete()
+          () -> existing.delete()
         );
       });
+
     command
       .variables()
       .stream()
       .filter(it ->
         existingVariables
           .stream()
-          .filter(oldValue -> oldValue.getId().equals(it.id()))
+          .filter(oldValue -> oldValue.data().id().equals(it.id()))
           .findAny()
           .isEmpty()
       )
-      .forEach(valueToCreate -> {
-        switch (valueToCreate.type()) {
-          case "string" -> variables.create(
-            recipientId,
-            "string",
-            valueToCreate.id(),
-            valueToCreate.name(),
-            valueToCreate.value()
-          );
-          case "number" -> variables.create(
-            recipientId,
-            "number",
-            valueToCreate.id(),
-            valueToCreate.name(),
-            valueToCreate.value()
-          );
-          default -> {}
-        }
-      });
+      .forEach(valueToCreate ->
+        variables.create(
+          recipientId,
+          valueToCreate.type(),
+          valueToCreate.id(),
+          valueToCreate.name(),
+          valueToCreate.value()
+        )
+      );
   }
 
   private void updateRules(String recipientId, SetStateCommand command) {
@@ -119,24 +126,46 @@ public class SetState extends BaseController implements SetStateApi {
     );
     existingRules
       .stream()
-      .forEach(rule -> {
+      .forEach(existing -> {
         final Optional<AutomationRuleDto> updatedRule = command
           .rules()
           .stream()
-          .filter(it -> it.id().equals(rule.getId()))
+          .filter(it -> it.id().equals(existing.data().id()))
           .findAny();
         updatedRule.ifPresentOrElse(
-          updated -> updated.asDomain(recipientId, ruleDataRepository).save(),
-          () -> rule.delete()
+          updated ->
+            existing.update(
+              new AutomationRuleData(
+                updated.id(),
+                updated.name(),
+                recipientId,
+                updated
+                  .triggers()
+                  .stream()
+                  .map(trigger ->
+                    new AutomationTriggerData(trigger.id(), trigger.value())
+                  )
+                  .toList(),
+                updated
+                  .actions()
+                  .stream()
+                  .map(action ->
+                    new AutomationActionData(action.id(), action.value())
+                  )
+                  .toList()
+              )
+            ),
+          () -> existing.delete()
         );
       });
+
     command
       .rules()
       .stream()
       .filter(rule ->
         existingRules
           .stream()
-          .filter(it -> it.getId().equals(rule.id()))
+          .filter(it -> it.data().id().equals(rule.id()))
           .findAny()
           .isEmpty()
       )
@@ -145,8 +174,19 @@ public class SetState extends BaseController implements SetStateApi {
           recipientId,
           rule.id(),
           rule.name(),
-          rule.triggers().stream().map(AutomationTriggerDto::asDomain).toList(),
-          rule.actions().stream().map(AutomationActionDto::asDomain).toList()
+          rule
+            .triggers()
+            .stream()
+            .map(trigger ->
+              new AutomationTriggerData(trigger.id(), trigger.value())
+            )
+            .toList(),
+          rule
+            .actions()
+            .stream()
+            .map(action -> new AutomationActionData(action.id(), action.value())
+            )
+            .toList()
         )
       );
   }

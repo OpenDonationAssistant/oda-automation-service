@@ -3,6 +3,8 @@ package io.github.opendonationassistant.automation.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.opendonationassistant.automation.AutomationVariable;
+import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
+import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
@@ -11,7 +13,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -34,6 +35,16 @@ public class AutomationVariableRepositoryTest {
       null
     );
     log.debug("Created string variable", Map.of("variable", createdString));
+
+    assertTrue(createdString instanceof AutomationStringVariable);
+    assertTrue(
+      createdString.data().id() != null && !createdString.data().id().isEmpty()
+    );
+    assertEquals("string", createdString.data().type());
+    assertEquals(recipientId, createdString.data().recipientId());
+    assertEquals("", createdString.value());
+    assertEquals("<Без названия>", createdString.data().name());
+
     final AutomationVariable<?> createdNumber = repository.create(
       recipientId,
       "number",
@@ -42,17 +53,18 @@ public class AutomationVariableRepositoryTest {
       null
     );
 
-    assertFalse(createdString.getId().isBlank());
-    assertEquals(recipientId, createdString.getRecipientId());
-    assertEquals("", createdString.getValue());
-
-    assertFalse(createdNumber.getId().isBlank());
-    assertEquals(recipientId, createdNumber.getRecipientId());
-    assertEquals(BigDecimal.ZERO, createdNumber.getValue());
+    assertTrue(createdNumber instanceof AutomationNumberVariable);
+    assertTrue(
+      createdNumber.data().id() != null && !createdNumber.data().id().isEmpty()
+    );
+    assertEquals("number", createdNumber.data().type());
+    assertEquals(recipientId, createdNumber.data().recipientId());
+    assertEquals("<Без названия>", createdString.data().name());
+    assertEquals(BigDecimal.ZERO, createdNumber.value());
   }
 
   @Test
-  public void testCreatingVariableWithIdAndValue(
+  public void testCreatingStringVariableWithIdAndValue(
     @Given String recipientId,
     @Given String variableId,
     @Given String name,
@@ -66,45 +78,92 @@ public class AutomationVariableRepositoryTest {
       value
     );
     log.debug("Created string variable", Map.of("variable", createdString));
-    assertEquals(variableId, createdString.getId());
-    assertEquals(recipientId, createdString.getRecipientId());
-    assertEquals(value, createdString.getValue());
+    assertEquals(variableId, createdString.data().id());
+    assertEquals("string", createdString.data().type());
+    assertEquals(recipientId, createdString.data().recipientId());
+    assertEquals(value, createdString.value());
   }
 
   @Test
-  public void testUpdatingVariable(
+  public void testCreatingNumberVariableWithIdAndValue(
+    @Given String recipientId,
+    @Given String variableId,
+    @Given String name
+  ) {
+    BigDecimal value = new BigDecimal("123.45");
+    final AutomationVariable<?> created = repository.create(
+      recipientId,
+      "number",
+      variableId,
+      name,
+      value.toString()
+    );
+    log.debug("Created number variable", Map.of("variable", created));
+    assertEquals(variableId, created.data().id());
+    assertEquals("number", created.data().type());
+    assertEquals(recipientId, created.data().recipientId());
+    assertEquals(value, created.value());
+  }
+
+  @Test
+  public void testUpdatingStringVariable(
     @Given String recipientId,
     @Given String newName,
     @Given String newValue
   ) {
-    final AutomationVariable<String> createdString = (AutomationVariable<
-        String
-      >) repository.create(recipientId, "string", null, null, null);
-    createdString.setName(newName);
-    createdString.setValue(newValue);
-    createdString.save();
+    var created = repository.create(recipientId, "string", null, null, null);
+    assertTrue(created instanceof AutomationStringVariable);
+    if (created instanceof AutomationStringVariable createdString) {
+      createdString.update(newName, newValue);
+      final Optional<AutomationVariable<?>> updated = repository.getById(
+        recipientId,
+        createdString.data().id()
+      );
+      assertTrue(updated.isPresent());
+      final AutomationVariable<?> updatedString = updated.get();
+      assertEquals(recipientId, updatedString.data().recipientId());
+      assertEquals(createdString.data().id(), updatedString.data().id());
+      assertEquals(newName, updatedString.data().name());
+      assertEquals(newValue, updatedString.data().value());
+    }
+  }
 
-    final Optional<AutomationVariable<?>> updatedString = repository.getById(
-      recipientId,
-      createdString.getId()
-    );
-    assertTrue(updatedString.isPresent());
-    final AutomationVariable<?> updated = updatedString.get();
-    assertEquals(recipientId, updated.getRecipientId());
-    assertEquals(createdString.getId(), updated.getId());
-    assertEquals(newName, updated.getName());
-    assertEquals(newValue, updated.getValue());
+  @Test
+  public void testUpdatingNumberVariable(
+    @Given String recipientId,
+    @Given String newName,
+    @Given BigDecimal newValue
+  ) {
+    var created = repository.create(recipientId, "number", null, null, null);
+    assertTrue(created instanceof AutomationNumberVariable);
+    if (created instanceof AutomationNumberVariable createdNumber) {
+      createdNumber.update(newName, newValue);
+      final Optional<AutomationVariable<?>> updated = repository.getById(
+        recipientId,
+        createdNumber.data().id()
+      );
+      assertTrue(updated.isPresent());
+      final AutomationVariable<?> updatedString = updated.get();
+      assertEquals(recipientId, updatedString.data().recipientId());
+      assertEquals(createdNumber.data().id(), updatedString.data().id());
+      assertEquals(newName, updatedString.data().name());
+      assertEquals(newValue, updatedString.value());
+    }
   }
 
   @Test
   public void testDeletingVariable(@Given String recipientId) {
-    final AutomationVariable<String> createdString = (AutomationVariable<
-        String
-      >) repository.create(recipientId, "string", null, null, null);
+    var createdString = repository.create(
+      recipientId,
+      "string",
+      null,
+      null,
+      null
+    );
     createdString.delete();
     final Optional<AutomationVariable<?>> updatedString = repository.getById(
       recipientId,
-      createdString.getId()
+      createdString.data().id()
     );
     assertTrue(updatedString.isEmpty());
   }

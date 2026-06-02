@@ -1,8 +1,9 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
+import io.github.opendonationassistant.automation.AutomationAction.EmptyAutomationAction;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
-import io.github.opendonationassistant.automation.domain.reel.ReelCommandSender;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import jakarta.inject.Inject;
@@ -14,60 +15,49 @@ import java.util.Map;
 public class ActionFactory {
 
   private final AutomationVariableRepository variables;
-  private final ReelCommandSender reelCommandSender;
-  private final RabbitClient commandsRabbitClient;
+  private final RabbitClient rabbit;
 
   @Inject
   public ActionFactory(
     AutomationVariableRepository variables,
-    ReelCommandSender reelCommandSender,
-    @Named("commands") RabbitClient commandsRabbitClient
+    @Named("commands") RabbitClient rabbit
   ) {
     this.variables = variables;
-    this.reelCommandSender = reelCommandSender;
-    this.commandsRabbitClient = commandsRabbitClient;
+    this.rabbit = rabbit;
   }
 
-  public AutomationAction create(
+  public AutomationAction convert(
     String recipientId,
-    String id,
-    Map<String, Object> value,
-    Goal updatedGoal
+    AutomationActionData data
   ) {
-    return switch (id) {
-      case "increase-donation-goal" -> new IncreaseDonationGoalAction(
-        id,
-        value,
-        updatedGoal
-      );
-      case "refresh-donation-goal" -> new RefreshDonationGoalAction(
-        id,
-        value,
-        updatedGoal
-      );
+    return switch (data.id()) {
+      case "increase-donation-goal" -> new IncreaseDonationGoalAction(data);
+      case "refresh-donation-goal" -> new RefreshDonationGoalAction(data);
       case "increase-variable" -> new IncreaseVariableAction(
-        id,
-        value,
+        data,
         recipientId,
         variables
       );
-      case "run-reel" -> new RunReelAction(
-        id,
-        value,
+      case "run-reel" -> new RunReelAction(data, recipientId, rabbit);
+      case "pin-twitch-message" -> new PinTwitchMessageAction(data, rabbit);
+      case "twitch-shoutout" -> new TwitchShoutoutAction(data, rabbit);
+      default -> new EmptyAutomationAction(data);
+    };
+  }
+
+  public AutomationAction from(String recipientId, AutomationActionData data) {
+    return switch (data.id()) {
+      case "increase-donation-goal" -> new IncreaseDonationGoalAction(data);
+      case "refresh-donation-goal" -> new RefreshDonationGoalAction(data);
+      case "increase-variable" -> new IncreaseVariableAction(
+        data,
         recipientId,
-        reelCommandSender
+        variables
       );
-      case "pin-twitch-message" -> new PinTwitchMessageAction(
-        id,
-        value,
-        commandsRabbitClient
-      );
-      case "twitch-shoutout" -> new TwitchShoutoutAction(
-        id,
-        value,
-        commandsRabbitClient
-      );
-      default -> new AutomationAction(id, value);
+      case "run-reel" -> new RunReelAction(data, recipientId, rabbit);
+      case "pin-twitch-message" -> new PinTwitchMessageAction(data, rabbit);
+      case "twitch-shoutout" -> new TwitchShoutoutAction(data, rabbit);
+      default -> new EmptyAutomationAction(data);
     };
   }
 }

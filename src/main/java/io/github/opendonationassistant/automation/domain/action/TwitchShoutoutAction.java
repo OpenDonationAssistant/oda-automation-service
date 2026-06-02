@@ -1,6 +1,8 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
+import io.github.opendonationassistant.automation.domain.Iteration;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.serde.annotation.Serdeable;
@@ -12,26 +14,28 @@ public class TwitchShoutoutAction extends AutomationAction {
   private final RabbitClient rabbitClient;
 
   public TwitchShoutoutAction(
-    String id,
-    Map<String, Object> value,
+    AutomationActionData data,
     RabbitClient rabbitClient
   ) {
-    super(id, value);
+    super(data);
     this.rabbitClient = rabbitClient;
   }
 
-  public void execute() {
-    final String recipientId = (String) getValue().get("recipientId");
-    final String targetTwitchId = (String) getValue().get("targetTwitchId");
-    log.info(
-      "Executing TwitchShoutoutAction",
-      Map.of("recipientId", recipientId, "targetTwitchId", targetTwitchId)
-    );
-    if (recipientId == null || targetTwitchId == null) {
+  @Override
+  public void execute(Iteration iteration) {
+    final String targetTwitchId = (String) data().value().get("targetTwitchId");
+    // prettier-ignore ON
+    log.info("Executing TwitchShoutoutAction", Map.of(
+        "recipientId", iteration.recipientId(),
+        "targetTwitchId", targetTwitchId
+    ));
+    // prettier-ignore OFF
+
+    if (targetTwitchId == null) {
       return;
     }
     rabbitClient.sendCommand(
-      new TwitchShoutoutCommand(recipientId, targetTwitchId)
+      new TwitchShoutoutCommand(iteration.recipientId(), targetTwitchId)
     );
   }
 

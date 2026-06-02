@@ -1,10 +1,11 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
+import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import java.math.BigDecimal;
-import java.util.Map;
 import java.util.Optional;
 
 public class IncreaseVariableAction extends AutomationAction {
@@ -13,35 +14,33 @@ public class IncreaseVariableAction extends AutomationAction {
   private AutomationVariableRepository variables;
 
   public IncreaseVariableAction(
-    String id,
-    Map<String, Object> value,
+    AutomationActionData data,
     String recipientId,
     AutomationVariableRepository variables
   ) {
-    super(id, value);
+    super(data);
     this.recipientId = recipientId;
     this.variables = variables;
   }
 
   public Optional<String> getVariableId() {
-    return Optional.ofNullable((String) this.getValue().get("id"));
+    return Optional.ofNullable((String) this.data().value().get("id"));
   }
 
   public Optional<Integer> getAmount() {
-    return Optional.ofNullable((Integer) this.getValue().get("value"));
+    return Optional.ofNullable((Integer) this.data().value().get("value"));
   }
 
-  public void execute() {
+  @Override
+  public void execute(Iteration iteration) {
     getVariableId()
       .flatMap(id -> variables.getById(recipientId, id))
       .filter(variable -> variable instanceof AutomationNumberVariable)
       .map(variable -> (AutomationNumberVariable) variable)
-      .ifPresent(variable ->{
+      .ifPresent(variable ->
         variable.setValue(
-          variable.getValue().add(new BigDecimal(getAmount().orElse(0)))
-        );
-        variable.save();
-      }
+          variable.value().add(new BigDecimal(getAmount().orElse(0)))
+        )
       );
   }
 }

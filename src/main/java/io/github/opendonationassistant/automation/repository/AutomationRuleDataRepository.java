@@ -9,8 +9,10 @@ import java.util.Optional;
 @JdbcRepository(dialect = Dialect.POSTGRES)
 public interface AutomationRuleDataRepository
   extends CrudRepository<AutomationRuleData, String> {
-
   public List<AutomationRuleData> getByRecipientId(String recipientId);
-  public Optional<AutomationRuleData> getByRecipientIdAndId(String recipientId, String id);
 
+  public Optional<AutomationRuleData> getByRecipientIdAndId(
+    String recipientId,
+    String id
+  );
 }

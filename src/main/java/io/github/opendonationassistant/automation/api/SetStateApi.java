@@ -11,22 +11,24 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(name = "Automation Commands", description = "Commands for updating automation state")
+@Tag(
+  name = "Automation Commands",
+  description = "Commands for updating automation state"
+)
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public interface SetStateApi {
-
   @Post("/automation/commands/setstate")
   @Operation(
     summary = "Set automation state",
     description = "Updates automation variables and rules for the authenticated user"
   )
-  @ApiResponse(
-    responseCode = "200",
-    description = "State successfully updated"
-  )
+  @ApiResponse(responseCode = "200", description = "State successfully updated")
   @ApiResponse(
     responseCode = "401",
     description = "Unauthorized - user not authenticated"
   )
-  HttpResponse<Void> setState(Authentication auth, @Body SetStateCommand command);
+  HttpResponse<Void> setState(
+    Authentication auth,
+    @Body SetStateCommand command
+  );
 }

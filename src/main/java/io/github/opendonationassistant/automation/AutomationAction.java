@@ -1,62 +1,29 @@
 package io.github.opendonationassistant.automation;
 
-import io.github.opendonationassistant.automation.dto.AutomationActionDto;
-import io.github.opendonationassistant.automation.repository.AutomationRuleData.AutomationActionData;
-import io.micronaut.serde.ObjectMapper;
-import io.micronaut.serde.annotation.Serdeable;
-import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
-import java.util.Map;
+import io.github.opendonationassistant.automation.domain.Iteration;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
 
-@Serdeable
-@EqualsAndHashCode
-public class AutomationAction {
+public abstract class AutomationAction {
 
-  private String id;
-  private Map<String, Object> value;
+  private final AutomationActionData data;
 
-  public AutomationAction(String id, Map<String, Object> value) {
-    this.id = id;
-    this.value = value;
+  public AutomationAction(AutomationActionData data) {
+    this.data = data;
   }
 
-  public AutomationActionData asData() {
-    return new AutomationActionData(this.getId(), this.getValue());
+  public AutomationActionData data() {
+    return data;
   }
 
-  public AutomationActionDto asDto() {
-    return new AutomationActionDto(this.id, this.value);
-  }
+  public abstract void execute(Iteration iteration);
 
-  public void execute() {}
+  public static class EmptyAutomationAction extends AutomationAction {
 
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public Map<String, Object> getValue() {
-    return value;
-  }
-
-  @Override
-  public String toString() {
-    try {
-      return ObjectMapper.getDefault().writeValueAsString(this);
-    } catch (Exception e) {
-      return "Can't serialize as  json";
+    public EmptyAutomationAction(AutomationActionData data) {
+      super(data);
     }
-  }
 
-  @Override
-  public boolean equals(Object o) {
-    return AutomationActionObject.equals(this, o);
-  }
-
-  @Override
-  public int hashCode() {
-    return AutomationActionObject.hashCode(this);
+    @Override
+    public void execute(Iteration iteration) {}
   }
 }

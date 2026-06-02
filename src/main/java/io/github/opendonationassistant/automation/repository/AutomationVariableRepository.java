@@ -73,7 +73,7 @@ public class AutomationVariableRepository {
     return created;
   }
 
-  public AutomationVariable<?> create(
+  public AutomationVariable<? extends Object> create(
     String recipientId,
     String type,
     @Nullable String variableId,
@@ -98,31 +98,9 @@ public class AutomationVariableRepository {
 
   private AutomationVariable<?> convert(AutomationVariableData it) {
     return switch (it.type()) {
-      case "number" -> new AutomationNumberVariable(
-        it.recipientId(),
-        it.id(),
-        it.name(),
-        Optional.ofNullable(it.value())
-          .filter(StringUtils::isNotEmpty)
-          .map(BigDecimal::new)
-          .orElse(BigDecimal.ZERO),
-        repository
-      );
-      case "string" -> new AutomationStringVariable(
-        it.recipientId(),
-        it.id(),
-        it.name(),
-        it.value(),
-        repository
-      );
-      default -> new AutomationVariable<String>(
-        it.recipientId(),
-        it.id(),
-        it.name(),
-        it.value(),
-        repository
-      );
+      case "number" -> new AutomationNumberVariable(it, repository);
+      case "string" -> new AutomationStringVariable(it, repository);
+      default -> new AutomationVariable<String>(it, repository);
     };
   }
-
 }

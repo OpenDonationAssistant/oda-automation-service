@@ -1,65 +1,36 @@
 package io.github.opendonationassistant.automation;
 
-import io.github.opendonationassistant.automation.domain.goal.Goal;
-import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
-import io.github.opendonationassistant.automation.repository.AutomationRuleData.AutomationTriggerData;
-import io.micronaut.serde.ObjectMapper;
-import io.micronaut.serde.annotation.Serdeable;
-import io.micronaut.sourcegen.annotations.EqualsAndHashCode;
-import java.util.Map;
+import io.github.opendonationassistant.automation.domain.Iteration;
+import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
 
-@Serdeable
-@EqualsAndHashCode
-public class AutomationTrigger {
+public abstract class AutomationTrigger {
 
-  private String id;
-  private Map<String, Object> value;
+  private final AutomationTriggerData data;
 
-  public AutomationTrigger(String id, Map<String, Object> value) {
-    this.id = id;
-    this.value = value;
+  public AutomationTrigger(AutomationTriggerData data) {
+    this.data = data;
   }
 
-  public boolean isTriggered(Goal goal) {
-    return false;
+  public AutomationTriggerData data() {
+    return data;
   }
 
-  public String getId() {
-    return id;
-  }
+  public abstract boolean isTriggered(Object target);
 
-  public void setId(String id) {
-    this.id = id;
-  }
+  public abstract void extractVariables(Object target, Iteration iteration);
 
-  public Map<String, Object> getValue() {
-    return value;
-  }
+  public static class NeverTrigger extends AutomationTrigger {
 
-  public AutomationTriggerData asData() {
-    return new AutomationTriggerData(this.getId(), this.getValue());
-  }
-
-  public AutomationTriggerDto asDto() {
-    return new AutomationTriggerDto(this.getId(), this.getValue());
-  }
-
-  @Override
-  public String toString() {
-    try {
-      return ObjectMapper.getDefault().writeValueAsString(this);
-    } catch (Exception e) {
-      return "Can't serialize as  json";
+    public NeverTrigger(AutomationTriggerData data) {
+      super(data);
     }
-  }
 
-  @Override
-  public boolean equals(Object o) {
-    return AutomationTriggerObject.equals(this, o);
-  }
+    @Override
+    public boolean isTriggered(Object target) {
+      return false;
+    }
 
-  @Override
-  public int hashCode() {
-    return AutomationTriggerObject.hashCode(this);
+    @Override
+    public void extractVariables(Object target, Iteration iteration) {}
   }
 }

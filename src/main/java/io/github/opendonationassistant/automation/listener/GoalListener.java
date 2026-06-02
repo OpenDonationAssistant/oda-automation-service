@@ -1,11 +1,9 @@
 package io.github.opendonationassistant.automation.listener;
 
-import io.github.opendonationassistant.automation.AutomationAction;
-import io.github.opendonationassistant.automation.AutomationRule;
-import io.github.opendonationassistant.automation.domain.action.ActionFactory;
+import java.util.Map;
+
+import io.github.opendonationassistant.automation.domain.IterationFactory;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
-import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
-import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.commons.Amount;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.events.goal.UpdatedGoal;
@@ -14,39 +12,27 @@ import io.github.opendonationassistant.events.goal.UpdatedGoalSender.Stage;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
-import java.util.List;
-import java.util.Map;
 
 @RabbitListener
 public class GoalListener {
 
   private final ODALogger log = new ODALogger(this);
 
-  private final AutomationRuleRepository ruleRepository;
-  private final TriggerFactory triggerFactory;
-  private final ActionFactory actionFactory;
+  private final IterationFactory iterationFactory;
   private final UpdatedGoalSender goalSender;
 
   @Inject
   public GoalListener(
-    AutomationRuleRepository ruleRepository,
-    TriggerFactory triggerFactory,
-    ActionFactory actionFactory,
+    IterationFactory iterationFactory,
     UpdatedGoalSender goalSender
   ) {
-    this.triggerFactory = triggerFactory;
-    this.actionFactory = actionFactory;
-    this.ruleRepository = ruleRepository;
+    this.iterationFactory = iterationFactory;
     this.goalSender = goalSender;
   }
 
   @Queue(io.github.opendonationassistant.rabbit.Queue.Automation.GOAL)
   public void checkAutomationForUpdatedGoals(UpdatedGoal updated) {
-    final List<AutomationRule> rules = ruleRepository.listByRecipientId(
-      updated.recipientId()
-    );
-
-    log.info("Handling UpdatedGoal", Map.of("goal", updated, "rules", rules));
+    log.info("Handling UpdatedGoal", Map.of("goal", updated));
 
     var goal = new Goal(
       updated.goalId(),
@@ -62,13 +48,13 @@ public class GoalListener {
     Goal updatedGoal = goal;
     do {
       updatedGoal = goal;
-      goal = process(updatedGoal, rules);
+      goal = process(updatedGoal);
     } while (checkHasChanges(updatedGoal, goal));
 
     updateGoal(goal);
   }
 
-  private Goal process(Goal goal, List<AutomationRule> rules) {
+  private Goal process(Goal goal) {
     var updatedGoal = new Goal(
       goal.getGoalId(),
       goal.getWidgetId(),
@@ -88,31 +74,8 @@ public class GoalListener {
       goal.getIsDefault()
     );
 
-    rules.forEach(rule ->
-      rule
-        .getTriggers()
-        .stream()
-        .map(trigger ->
-          triggerFactory.create(trigger.getId(), trigger.getValue())
-        )
-        .filter(trigger -> trigger.isTriggered(updatedGoal))
-        .findAny()
-        .ifPresent(trigger -> {
-          rule
-            .getActions()
-            .stream()
-            .map(action ->
-              actionFactory.create(
-                goal.getRecipientId(),
-                action.getId(),
-                action.getValue(),
-                updatedGoal
-              )
-            )
-            .toList()
-            .forEach(AutomationAction::execute);
-        })
-    );
+    iterationFactory.create(goal.getRecipientId(), updatedGoal).run();
+
     return updatedGoal;
   }
 

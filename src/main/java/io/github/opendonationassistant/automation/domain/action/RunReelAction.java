@@ -1,30 +1,32 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
-import io.github.opendonationassistant.automation.domain.reel.ReelCommand;
-import io.github.opendonationassistant.automation.domain.reel.ReelCommandSender;
+import io.github.opendonationassistant.automation.domain.Iteration;
+import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.commons.logging.ODALogger;
+import io.github.opendonationassistant.events.reel.ReelCommand;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import java.util.Map;
 
 public class RunReelAction extends AutomationAction {
 
   private final ODALogger log = new ODALogger(this);
-  private final ReelCommandSender reelCommandSender;
+  private final RabbitClient rabbit;
   private final String recipientId;
 
   public RunReelAction(
-    String id,
-    Map<String, Object> value,
+    AutomationActionData data,
     String recipientId,
-    ReelCommandSender reelCommandSender
+    RabbitClient rabbit
   ) {
-    super(id, value);
-    this.reelCommandSender = reelCommandSender;
+    super(data);
+    this.rabbit = rabbit;
     this.recipientId = recipientId;
   }
 
-  public void execute() {
-    final String reelId = (String) getValue().get("reelId");
+  @Override
+  public void execute(Iteration iteration) {
+    final String reelId = (String) data().value().get("reelId");
     log.info(
       "Executing RunReelAction",
       Map.of("reelId", reelId, "recipientId", recipientId)
@@ -32,9 +34,13 @@ public class RunReelAction extends AutomationAction {
     if (reelId == null) {
       return;
     }
-    reelCommandSender.send(
-      "reel",
-      new ReelCommand("select", "", reelId, "", recipientId)
+    rabbit.sendCommand(
+      new ReelCommand.TriggerReelCommand(
+        "", // widgetId
+        "", // recipientId
+        "", // source
+        "" // originId
+      )
     );
   }
 }

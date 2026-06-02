@@ -2,9 +2,7 @@ package io.github.opendonationassistant.automation.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationRule;
-import io.github.opendonationassistant.automation.AutomationTrigger;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import java.util.List;
@@ -32,17 +30,19 @@ public class AutomationRuleRepositoryTest {
     @Given String recipientId,
     @Given String id,
     @Given String name,
-    @Given AutomationTrigger trigger,
-    @Given AutomationAction action
+    @Given AutomationTriggerData trigger,
+    @Given AutomationActionData action
   ) {
     repository.create(recipientId, id, name, List.of(trigger), List.of(action));
-    final Optional<AutomationRule> created =
+
+    final Optional<AutomationRule> optionallyCreated =
       repository.getByRecipientIdAndRuleId(recipientId, id);
-    assertTrue(created.isPresent());
-    assertEquals(recipientId, created.get().getRecipientId());
-    assertEquals(id, created.get().getId());
-    assertEquals(name, created.get().getName());
-    assertEquals(List.of(trigger), created.get().getTriggers());
-    assertEquals(List.of(action), created.get().getActions());
+    assertTrue(optionallyCreated.isPresent());
+    var created = optionallyCreated.get();
+    assertEquals(recipientId, created.data().recipientId());
+    assertEquals(id, created.data().id());
+    assertEquals(name, created.data().name());
+    assertEquals(List.of(trigger), created.data().triggers());
+    assertEquals(List.of(action), created.data().actions());
   }
 }
