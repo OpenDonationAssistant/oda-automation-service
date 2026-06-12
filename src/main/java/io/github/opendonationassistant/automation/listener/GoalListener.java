@@ -1,7 +1,5 @@
 package io.github.opendonationassistant.automation.listener;
 
-import java.util.Map;
-
 import io.github.opendonationassistant.automation.domain.IterationFactory;
 import io.github.opendonationassistant.automation.domain.goal.Goal;
 import io.github.opendonationassistant.commons.Amount;
@@ -12,6 +10,7 @@ import io.github.opendonationassistant.events.goal.UpdatedGoalSender.Stage;
 import io.micronaut.rabbitmq.annotation.Queue;
 import io.micronaut.rabbitmq.annotation.RabbitListener;
 import jakarta.inject.Inject;
+import java.util.Map;
 
 @RabbitListener
 public class GoalListener {

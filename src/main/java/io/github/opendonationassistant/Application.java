@@ -14,26 +14,14 @@ import io.micronaut.rabbitmq.connect.ChannelPool;
 import io.micronaut.runtime.Micronaut;
 import io.micronaut.serde.ObjectMapper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.info.License;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@OpenAPIDefinition(
-  info = @Info(
-    title = "ODA Automation Service",
-    version = "1.0.0",
-    description = "ODA Automation Service",
-    license = @License(
-      name = "GPL-3.0",
-      url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-    ),
-    contact = @Contact(name = "stCarolas", email = "stcarolas@gmail.com")
-  )
-)
+@OpenAPIDefinition(info = @Info(title = "ODA Automation Service"))
 @Factory
 public class Application {
 
@@ -52,37 +40,27 @@ public class Application {
 
   @Singleton
   public ChannelInitializer rabbitConfiguration() {
-    var events = new Queue("automation.events");
-    return new AMQPConfiguration(
+    var bindings = new ArrayList<Exchange>();
+    bindings.addAll(EventsListener.BINDING);
+    bindings.addAll(ProcessingListener.BINDING);
+    bindings.addAll(
       List.of(
         Exchange.Exchange(
-          "history",
-          Map.of(
-            "event.MediaHistoryEvent",
-            events,
-            "event.ReelResultHistoryEvent",
-            events,
-            "event.HistoryItemEvent",
-            events,
-            "event.GoalHistoryEvent",
-            events,
-            "event.CreateAlertCommand",
-            events
-          )
-        ),
-        Exchange.Exchange("payments", Map.of("event.PaymentEvent", events)),
-        Exchange.Exchange("automation", Map.of("command", events)), // TODO temporary to save order
+          "automation",
+          Map.of("command", EventsListener.QUEUE)
+        ), // TODO temporary to save order
         Exchange.Exchange(
           "commands",
-          Map.of("command.RepeatAlertCommand", events)
+          Map.of("command.RepeatAlertCommand", EventsListener.QUEUE)
         ),
-        Exchange.Exchange("changes.widgets", Map.of("*", events)),
+        Exchange.Exchange("changes.widgets", Map.of("*", EventsListener.QUEUE)),
         Exchange.Exchange(
           "goals",
           Map.of("afterpayment", new Queue("automation.goals"))
         )
       )
     );
+    return new AMQPConfiguration(bindings);
   }
 
   @Singleton

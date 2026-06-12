@@ -1,10 +1,5 @@
 package io.github.opendonationassistant.automation.commands;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.api.SetStateApi;
@@ -27,6 +22,10 @@ import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Inject;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class SetState extends BaseController implements SetStateApi {

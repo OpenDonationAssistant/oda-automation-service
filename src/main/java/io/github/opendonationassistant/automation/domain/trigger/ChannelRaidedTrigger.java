@@ -5,9 +5,9 @@ import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
 import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
 
-public class StreamStartedTrigger extends AutomationTrigger {
+public class ChannelRaidedTrigger extends AutomationTrigger {
 
-  public StreamStartedTrigger(AutomationTriggerData data) {
+  public ChannelRaidedTrigger(AutomationTriggerData data) {
     super(data);
   }
 
