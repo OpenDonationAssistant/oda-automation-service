@@ -33,7 +33,8 @@ public class EventsListener {
         QUEUE
       )
     ),
-    Exchange.Exchange("payments", Map.of("event.PaymentEvent", QUEUE))
+    Exchange.Exchange("payments", Map.of("event.PaymentEvent", QUEUE)),
+    Exchange.Exchange("twitch", Map.of("event.*", QUEUE))
   );
 
   private final MessageProcessor processor;
