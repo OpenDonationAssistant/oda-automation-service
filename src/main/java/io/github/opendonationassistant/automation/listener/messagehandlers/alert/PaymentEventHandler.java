@@ -24,8 +24,8 @@ public class PaymentEventHandler extends AbstractMessageHandler<PaymentEvent> {
     var data = new AlertData(
       Generators.timeBasedEpochGenerator().generate().toString(),
       message.recipientId(),
-      message.nickname(),
-      message.message(),
+      message.cleanNickname(),
+      message.cleanMessage(),
       message.amount(),
       null,
       null,
