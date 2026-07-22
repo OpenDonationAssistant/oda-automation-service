@@ -6,6 +6,7 @@ import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.model.DataType;
 import io.micronaut.serde.annotation.Serdeable;
+import java.time.Instant;
 import org.jspecify.annotations.Nullable;
 
 @Serdeable
@@ -18,7 +19,9 @@ public record AlertData(
   @Nullable Amount amount,
   @Nullable @MappedProperty(type = DataType.JSON) AlertMedia media,
   @Nullable String levelName,
-  @Nullable Integer count
+  @Nullable Integer count,
+  Instant createdAt,
+  boolean hidden
 ) {
   @Serdeable
   public record AlertMedia(String url) {}

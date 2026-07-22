@@ -9,6 +9,7 @@ import io.micronaut.serde.ObjectMapper;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.inject.Singleton;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
@@ -40,7 +41,9 @@ public class CreateAlertCommandHandler
         .map(url -> new AlertData.AlertMedia(convertUrl(url)))
         .orElse(null),
       message.levelName(),
-      message.count()
+      message.count(),
+      Instant.now(),
+      false
     );
     repository.create(
       message.system(),

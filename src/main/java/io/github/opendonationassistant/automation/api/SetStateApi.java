@@ -9,12 +9,7 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
-@Tag(
-  name = "Automation Commands",
-  description = "Commands for updating automation state"
-)
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public interface SetStateApi {
   @Post("/automation/commands/setstate")

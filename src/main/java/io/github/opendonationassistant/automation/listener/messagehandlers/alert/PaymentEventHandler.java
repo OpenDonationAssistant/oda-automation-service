@@ -8,6 +8,7 @@ import io.github.opendonationassistant.events.payments.PaymentEvent;
 import io.micronaut.serde.ObjectMapper;
 import jakarta.inject.Singleton;
 import java.io.IOException;
+import java.time.Instant;
 
 @Singleton
 public class PaymentEventHandler extends AbstractMessageHandler<PaymentEvent> {
@@ -29,7 +30,9 @@ public class PaymentEventHandler extends AbstractMessageHandler<PaymentEvent> {
       message.amount(),
       null,
       null,
-      null
+      null,
+      Instant.now(),
+      false
     );
     repository.create("ODA", "payment", message.id(), data);
   }

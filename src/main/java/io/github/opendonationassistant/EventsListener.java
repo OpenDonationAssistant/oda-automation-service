@@ -30,6 +30,8 @@ public class EventsListener {
         "event.GoalHistoryEvent",
         QUEUE,
         "event.CreateAlertCommand",
+        QUEUE,
+        "event.DeletedHistoryItem",
         QUEUE
       )
     ),
