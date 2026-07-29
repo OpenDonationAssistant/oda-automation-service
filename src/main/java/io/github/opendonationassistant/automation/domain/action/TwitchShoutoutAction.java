@@ -23,19 +23,24 @@ public class TwitchShoutoutAction extends AutomationAction {
 
   @Override
   public void execute(Iteration iteration) {
-    final String targetTwitchId = (String) data().value().get("targetTwitchId");
-    // prettier-ignore ON
-    log.info("Executing TwitchShoutoutAction", Map.of(
-        "recipientId", iteration.recipientId(),
-        "targetTwitchId", targetTwitchId
-    ));
-    // prettier-ignore OFF
-
-    if (targetTwitchId == null) {
+    final var fromTwitchId = iteration.variable("fromChannelId");
+    if (fromTwitchId.isEmpty()) {
       return;
     }
+    log.info(
+      "Executing TwitchShoutoutAction",
+      Map.of(
+        "recipientId",
+        iteration.recipientId(),
+        "targetTwitchId",
+        fromTwitchId.get()
+      )
+    );
     rabbitClient.sendCommand(
-      new TwitchShoutoutCommand(iteration.recipientId(), targetTwitchId)
+      new TwitchShoutoutCommand(
+        iteration.recipientId(),
+        (String) (Object) fromTwitchId.get()
+      )
     );
   }
 

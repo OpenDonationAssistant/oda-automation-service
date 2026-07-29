@@ -5,7 +5,7 @@ import io.github.opendonationassistant.automation.repository.AutomationVariableD
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.Map;
 
-public class AutomationVariable<T> {
+public class AutomationVariable<T> implements IVariable<T> {
 
   private static final ODALogger log = new ODALogger(AutomationVariable.class);
 
@@ -22,6 +22,10 @@ public class AutomationVariable<T> {
 
   public AutomationVariableData data() {
     return data;
+  }
+
+  public String name() {
+    return data.name();
   }
 
   public T value() {

@@ -1,9 +1,9 @@
 package io.github.opendonationassistant;
 
 import io.github.opendonationassistant.automation.domain.IterationFactory;
+import io.github.opendonationassistant.automation.listener.messagehandlers.twitch.TwitchChannelRaidEventHandler.TwitchChannelRaidEvent;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.events.HasRecipientId;
-import io.github.opendonationassistant.events.twitch.events.TwitchChannelRaidEvent;
 import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
 import io.github.opendonationassistant.rabbit.Exchange;
 import io.micronaut.messaging.annotation.MessageHeader;
