@@ -3,6 +3,7 @@ package io.github.opendonationassistant.automation.listener.messagehandlers.twit
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import io.github.opendonationassistant.events.AbstractMessageHandler;
+import io.github.opendonationassistant.events.HasRecipientId;
 import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Event;
 import io.github.opendonationassistant.events.ui.UIFacade.Variable;
@@ -56,5 +57,5 @@ public class TwitchChannelRaidEventHandler
     String fromChannelId,
     String fromChannelName,
     Integer viewerCount
-  ) {}
+  ) implements HasRecipientId {}
 }

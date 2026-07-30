@@ -46,6 +46,7 @@ public class ProcessingListener {
     byte[] message,
     RabbitAcknowledgement ack
   ) throws IOException {
+    log.debug("Received event for processing", Map.of("type", type));
     try {
       convert(type, message).ifPresent(event -> {
         if (event instanceof HasRecipientId source) {
