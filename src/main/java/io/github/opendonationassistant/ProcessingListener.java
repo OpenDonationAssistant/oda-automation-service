@@ -64,7 +64,12 @@ public class ProcessingListener {
     } catch (Exception e) {
       log.error(
         "Error processing step",
-        Map.of("error", e.getLocalizedMessage())
+        Map.of(
+          "error",
+          Optional.ofNullable(e.getLocalizedMessage()).orElse(
+            e.getClass().getCanonicalName()
+          )
+        )
       );
     }
   }

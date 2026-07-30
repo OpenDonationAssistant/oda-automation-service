@@ -3,12 +3,15 @@ package io.github.opendonationassistant.automation.domain;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.IVariable;
+import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class Iteration {
 
+  private ODALogger log = new ODALogger(this);
   private final String recipientId;
   private final Object source;
   private final List<IVariable<?>> variables;
@@ -47,6 +50,10 @@ public class Iteration {
   }
 
   public void run() {
+    log.debug(
+      "Running iteration",
+      Map.of("recipientId", recipientId, "source", source)
+    );
     rules.forEach(rule ->
       rule
         .getTriggers()
@@ -54,6 +61,7 @@ public class Iteration {
         .filter(trigger -> trigger.isTriggered(source))
         .findAny()
         .ifPresent(trigger -> {
+          log.debug("Trigger found", Map.of("id", trigger.data().id()));
           trigger.extractVariables(source, this);
           rule.getActions().forEach(action -> action.execute(this));
         })

@@ -24,18 +24,18 @@ public class TwitchShoutoutAction extends AutomationAction {
   @Override
   public void execute(Iteration iteration) {
     final var fromTwitchId = iteration.variable("fromChannelId");
-    if (fromTwitchId.isEmpty()) {
-      return;
-    }
     log.info(
       "Executing TwitchShoutoutAction",
       Map.of(
         "recipientId",
         iteration.recipientId(),
         "targetTwitchId",
-        fromTwitchId.get()
+        fromTwitchId
       )
     );
+    if (fromTwitchId.isEmpty()) {
+      return;
+    }
     rabbitClient.sendCommand(
       new TwitchShoutoutCommand(
         iteration.recipientId(),
