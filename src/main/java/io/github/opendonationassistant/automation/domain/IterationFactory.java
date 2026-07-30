@@ -26,18 +26,17 @@ public class IterationFactory {
   }
 
   public Iteration create(String recipientId, Object source) {
-    var iteration = new Iteration(
-      recipientId,
-      source,
-      variableRepository.listByRecipientId(recipientId),
-      ruleRepository.listByRecipientId(recipientId)
-    );
-    final Supplier<Map<String, ?>> supplier = () -> {
+    var rules = ruleRepository.listByRecipientId(recipientId);
+    var variables = variableRepository.listByRecipientId(recipientId);
+    var iteration = new Iteration(recipientId, source, variables, rules);
+    final Supplier<Map<String, ?>> logSupplier = () -> {
       var output = new HashMap<String, Object>();
       output.put("recipientId", recipientId);
+      output.put("rules", rules.stream().map(it -> it.data()).toList());
+      output.put("variables", variables.stream().map(it -> it.data()).toList());
       return output;
     };
-    log.debug("Created iteration", supplier);
+    log.debug("Created iteration", logSupplier);
     return iteration;
   }
 }

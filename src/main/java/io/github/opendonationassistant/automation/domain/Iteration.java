@@ -5,9 +5,11 @@ import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.IVariable;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class Iteration {
 
@@ -50,10 +52,20 @@ public class Iteration {
   }
 
   public void run() {
-    log.debug(
-      "Running iteration",
-      Map.of("recipientId", recipientId, "source", source)
-    );
+    final Supplier<Map<String, ?>> logSupplier = () -> {
+      var output = new HashMap<String, Object>();
+      output.put("recipientId", recipientId);
+      output.put("source", source);
+      output.put(
+        "triggers",
+        rules
+          .stream()
+          .map(it -> it.getTriggers().stream().map(trigger -> trigger.getClass()))
+          .toList()
+      );
+      return output;
+    };
+    log.debug("Running iteration", logSupplier);
     rules.forEach(rule ->
       rule
         .getTriggers()

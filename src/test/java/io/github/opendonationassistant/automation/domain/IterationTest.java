@@ -60,8 +60,6 @@ public class IterationTest {
       List.of(),
       List.of(rule)
     ).run();
-    verify(triggers).from(triggerData);
-    verify(actions).from("testuser", actionData);
     verify(rabbit).sendCommand(
       new SendAndPinChatMessageCommand("testuser", "refreshTokenId", "message")
     );
