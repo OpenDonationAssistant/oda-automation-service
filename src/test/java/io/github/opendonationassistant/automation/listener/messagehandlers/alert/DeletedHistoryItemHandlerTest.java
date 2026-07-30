@@ -36,7 +36,7 @@ public class DeletedHistoryItemHandlerTest {
   public void testHidesAlertByOriginId() throws IOException {
     var originId = "test-origin-id";
     var alertId = "test-alert-id";
-    var event = new DeletedHistoryItem("id", "recipientId", "system", originId);
+    var event = new DeletedHistoryItem("id", "recipientId", "system", originId, List.of());
     var alertLink = new AlertLink(
       "link-id",
       alertId,
@@ -73,7 +73,7 @@ public class DeletedHistoryItemHandlerTest {
 
   @Test
   public void testDoesNothingWhenOriginIdIsNull() throws IOException {
-    var event = new DeletedHistoryItem("id", "recipientId", "system", null);
+    var event = new DeletedHistoryItem("id", "recipientId", "system", null, List.of());
 
     handler.handle(event);
 
@@ -87,7 +87,7 @@ public class DeletedHistoryItemHandlerTest {
     var alertId1 = "alert-1";
     var alertId2 = "alert-2";
 
-    var event = new DeletedHistoryItem("id", "recipientId", "system", originId);
+    var event = new DeletedHistoryItem("id", "recipientId", "system", originId, List.of());
 
     var link1 = new AlertLink("link-1", alertId1, originId, "system", "event");
     var link2 = new AlertLink("link-2", alertId2, originId, "system", "event");
