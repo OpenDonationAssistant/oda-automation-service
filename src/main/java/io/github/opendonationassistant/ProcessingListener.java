@@ -71,11 +71,11 @@ public class ProcessingListener {
   private Optional<Object> convert(String type, byte[] message)
     throws IOException {
     switch (type) {
-      case "event.TwitchStreamStartedEvent":
+      case "TwitchStreamStartedEvent":
         return Optional.ofNullable(
           mapper.readValue(message, TwitchStreamStartedEvent.class)
         );
-      case "event.TwitchChannelRaidEvent":
+      case "TwitchChannelRaidEvent":
         return Optional.ofNullable(
           mapper.readValue(message, TwitchChannelRaidEvent.class)
         );
