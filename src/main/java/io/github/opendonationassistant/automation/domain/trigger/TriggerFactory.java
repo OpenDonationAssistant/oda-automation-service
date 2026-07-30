@@ -22,7 +22,7 @@ public class TriggerFactory {
     return switch (data.id()) {
       case "donationgoal-filled" -> new FilledDonationGoalTrigger(data);
       case "stream-started" -> new StreamStartedTrigger(data);
-      case "channel-raided" -> new StreamStartedTrigger(data);
+      case "channel-raided" -> new ChannelRaidedTrigger(data);
       default -> new NeverTrigger(data);
     };
   }
