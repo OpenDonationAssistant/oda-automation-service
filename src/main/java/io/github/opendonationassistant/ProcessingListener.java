@@ -52,11 +52,12 @@ public class ProcessingListener {
         if (event instanceof HasRecipientId source) {
           log.debug("Processing step", Map.of("type", type, "source", source));
           iterationFactory.create(source.recipientId(), source).run();
+        } else {
+          log.debug(
+            "Step missing recipientId",
+            Map.of("type", type, "event", event)
+          );
         }
-        log.debug(
-          "Step missing recipientId",
-          Map.of("type", type, "event", event)
-        );
       });
       ack.ack();
       log.debug("Step processed", Map.of("type", type));

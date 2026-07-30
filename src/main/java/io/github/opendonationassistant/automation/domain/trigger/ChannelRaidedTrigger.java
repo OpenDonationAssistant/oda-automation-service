@@ -5,7 +5,6 @@ import io.github.opendonationassistant.automation.EphemeralVariable;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.listener.messagehandlers.twitch.TwitchChannelRaidEventHandler.TwitchChannelRaidEvent;
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
-import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
 
 public class ChannelRaidedTrigger extends AutomationTrigger {
 
@@ -15,7 +14,7 @@ public class ChannelRaidedTrigger extends AutomationTrigger {
 
   @Override
   public boolean isTriggered(Object target) {
-    return target instanceof TwitchStreamStartedEvent;
+    return target instanceof TwitchChannelRaidEvent;
   }
 
   @Override
