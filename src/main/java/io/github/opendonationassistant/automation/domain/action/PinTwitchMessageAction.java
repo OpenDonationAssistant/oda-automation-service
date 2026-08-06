@@ -24,26 +24,49 @@ public class PinTwitchMessageAction extends AutomationAction {
   @Override
   public void execute(Iteration iteration) {
     final String recipientId = (String) data().value().get("recipientId");
-    final String refreshTokenId = (String) data().value().get("refreshTokenId");
+    final String refreshTokenId = (String) data()
+      .value()
+      .get("senderRefreshTokenId");
+    final String recipientTwitchId = (String) data()
+      .value()
+      .get("recipientTwitchId");
     final String message = (String) data().value().get("message");
-    // prettier-ignore ON
-    log.info("Executing PinTwitchMessageAction", Map.of(
-        "recipientId", recipientId,
-        "refreshTokenId", refreshTokenId
-    ));
-    // prettier-ignore OFF
-    if (recipientId == null || refreshTokenId == null || message == null) {
+    log.info(
+      "Executing PinTwitchMessageAction",
+      Map.of(
+        "recipientId",
+        recipientId,
+        "senderRefreshTokenId",
+        refreshTokenId,
+        "recipientTwitchId",
+        recipientTwitchId,
+        "message",
+        message
+      )
+    );
+    if (
+      recipientId == null ||
+      refreshTokenId == null ||
+      recipientTwitchId == null ||
+      message == null
+    ) {
       return;
     }
     rabbitClient.sendCommand(
-      new SendAndPinChatMessageCommand(recipientId, refreshTokenId, message)
+      new SendAndPinChatMessageCommand(
+        recipientId,
+        refreshTokenId,
+        recipientTwitchId,
+        message
+      )
     );
   }
 
   @Serdeable
-  public record SendAndPinChatMessageCommand(
+  public static record SendAndPinChatMessageCommand(
     String recipientId,
-    String refreshTokenId,
+    String senderRefreshTokenId,
+    String recipientTwitchId,
     String message
   ) {}
 }

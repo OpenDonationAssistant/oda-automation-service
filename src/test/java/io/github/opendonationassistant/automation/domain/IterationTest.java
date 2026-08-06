@@ -39,8 +39,10 @@ public class IterationTest {
       Map.of(
         "recipientId",
         "testuser",
-        "refreshTokenId",
-        "refreshTokenId",
+        "senderRefreshTokenId",
+        "senderRefreshTokenId",
+        "recipientTwitchId",
+        "recipientTwitchId",
         "message",
         "message"
       )
@@ -61,7 +63,12 @@ public class IterationTest {
       List.of(rule)
     ).run();
     verify(rabbit).sendCommand(
-      new SendAndPinChatMessageCommand("testuser", "refreshTokenId", "message")
+      new SendAndPinChatMessageCommand(
+        "testuser",
+        "senderRefreshTokenId",
+        "recipientTwitchId",
+        "message"
+      )
     );
   }
 
