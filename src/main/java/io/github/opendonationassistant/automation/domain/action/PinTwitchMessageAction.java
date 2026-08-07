@@ -23,7 +23,6 @@ public class PinTwitchMessageAction extends AutomationAction {
 
   @Override
   public void execute(Iteration iteration) {
-    final String recipientId = (String) data().value().get("recipientId");
     final String refreshTokenId = (String) data()
       .value()
       .get("senderRefreshTokenId");
@@ -31,11 +30,19 @@ public class PinTwitchMessageAction extends AutomationAction {
       .value()
       .get("recipientTwitchId");
     final String message = (String) data().value().get("message");
+    if (
+      iteration.recipientId() == null ||
+      refreshTokenId == null ||
+      recipientTwitchId == null ||
+      message == null
+    ) {
+      return;
+    }
     log.info(
       "Executing PinTwitchMessageAction",
       Map.of(
         "recipientId",
-        recipientId,
+        iteration.recipientId(),
         "senderRefreshTokenId",
         refreshTokenId,
         "recipientTwitchId",
@@ -44,17 +51,9 @@ public class PinTwitchMessageAction extends AutomationAction {
         message
       )
     );
-    if (
-      recipientId == null ||
-      refreshTokenId == null ||
-      recipientTwitchId == null ||
-      message == null
-    ) {
-      return;
-    }
     rabbitClient.sendCommand(
       new SendAndPinChatMessageCommand(
-        recipientId,
+        iteration.recipientId(),
         refreshTokenId,
         recipientTwitchId,
         message
