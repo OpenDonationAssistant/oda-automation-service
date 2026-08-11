@@ -15,13 +15,23 @@ import io.micronaut.runtime.Micronaut;
 import io.micronaut.serde.ObjectMapper;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@OpenAPIDefinition(info = @Info(title = "ODA Automation Service"))
+@OpenAPIDefinition(
+  info = @Info(
+    title = "ODA Automation Service",
+    version = "0.3.0",
+    license = @License(
+      name = "AGPL-3.0",
+      url = "https://www.gnu.org/licenses/agpl-3.0.en.html"
+    )
+  )
+)
 @Factory
 public class Application {
 

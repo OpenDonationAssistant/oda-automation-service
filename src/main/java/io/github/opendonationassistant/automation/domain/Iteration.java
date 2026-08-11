@@ -60,7 +60,12 @@ public class Iteration {
         "triggers",
         rules
           .stream()
-          .map(it -> it.getTriggers().stream().map(trigger -> trigger.getClass()))
+          .map(it ->
+            it
+              .getTriggers()
+              .stream()
+              .map(trigger -> trigger.getClass().getCanonicalName())
+          )
           .toList()
       );
       return output;

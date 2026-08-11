@@ -1,7 +1,9 @@
 package io.github.opendonationassistant.automation.domain.goal;
 
 import io.github.opendonationassistant.commons.Amount;
+import io.micronaut.serde.annotation.Serdeable;
 
+@Serdeable
 public class Goal {
 
   private String goalId;
