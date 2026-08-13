@@ -88,7 +88,8 @@ public class AutomationController implements AutomationOperationsApi {
         .actions()
         .stream()
         .map(action -> new AutomationActionDto(action.id(), action.value()))
-        .toList()
+        .toList(),
+      rule.data().enabled()
     );
   }
 

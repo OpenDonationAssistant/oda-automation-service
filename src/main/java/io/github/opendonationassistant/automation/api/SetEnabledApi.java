@@ -1,6 +1,6 @@
 package io.github.opendonationassistant.automation.api;
 
-import io.github.opendonationassistant.automation.commands.SetState.SetStateCommand;
+import io.github.opendonationassistant.automation.commands.SetEnabled.SetEnabledCommand;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Post;
@@ -11,19 +11,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
-public interface SetStateApi {
-  @Post("/automation/commands/set-state")
+public interface SetEnabledApi {
+  @Post("/automation/commands/set-enabled")
   @Operation(
-    summary = "Set automation state",
-    description = "Updates automation variables and rules for the authenticated user"
+    summary = "Toggle automation rule enabled state",
+    description = "Toggles the enabled field for an automation rule by id for the authenticated user"
   )
-  @ApiResponse(responseCode = "200", description = "State successfully updated")
+  @ApiResponse(responseCode = "200", description = "Rule enabled state toggled")
   @ApiResponse(
     responseCode = "401",
     description = "Unauthorized - user not authenticated"
   )
-  HttpResponse<Void> setState(
+  @ApiResponse(responseCode = "404", description = "Rule not found")
+  HttpResponse<Void> setEnabled(
     Authentication auth,
-    @Body SetStateCommand command
+    @Body SetEnabledCommand command
   );
 }

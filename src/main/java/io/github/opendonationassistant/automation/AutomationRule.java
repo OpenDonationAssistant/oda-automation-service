@@ -34,6 +34,19 @@ public class AutomationRule {
     return data;
   }
 
+  public void toggleEnabled() {
+    update(
+      new AutomationRuleData(
+        data.id(),
+        data.name(),
+        data.recipientId(),
+        data.triggers(),
+        data.actions(),
+        !data.enabled()
+      )
+    );
+  }
+
   public void save() {
     repository.update(data);
   }

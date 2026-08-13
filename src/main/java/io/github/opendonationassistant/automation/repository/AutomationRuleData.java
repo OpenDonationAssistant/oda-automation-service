@@ -14,5 +14,7 @@ public record AutomationRuleData(
   String name,
   String recipientId,
   @MappedProperty(type = DataType.JSON) List<AutomationTriggerData> triggers,
-  @MappedProperty(type = DataType.JSON) List<AutomationActionData> actions
-) {}
+  @MappedProperty(type = DataType.JSON) List<AutomationActionData> actions,
+  boolean enabled
+) {
+}

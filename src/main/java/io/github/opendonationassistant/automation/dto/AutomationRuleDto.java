@@ -8,5 +8,6 @@ public record AutomationRuleDto(
   String id,
   String name,
   List<AutomationTriggerDto> triggers,
-  List<AutomationActionDto> actions
+  List<AutomationActionDto> actions,
+  Boolean enabled
 ) {}

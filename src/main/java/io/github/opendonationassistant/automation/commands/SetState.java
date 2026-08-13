@@ -9,10 +9,8 @@ import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData;
-import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
-import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
@@ -34,20 +32,14 @@ public class SetState extends BaseController implements SetStateApi {
 
   private AutomationVariableRepository variables;
   private AutomationRuleRepository rules;
-  private AutomationRuleDataRepository ruleDataRepository;
-  private AutomationVariableDataRepository variableDataRepository;
 
   @Inject
   public SetState(
     AutomationVariableRepository variables,
-    AutomationRuleRepository rules,
-    AutomationRuleDataRepository ruleDataRepository,
-    AutomationVariableDataRepository variableDataRepository
+    AutomationRuleRepository rules
   ) {
     this.variables = variables;
     this.rules = rules;
-    this.variableDataRepository = variableDataRepository;
-    this.ruleDataRepository = ruleDataRepository;
   }
 
   public HttpResponse<Void> setState(
@@ -151,7 +143,8 @@ public class SetState extends BaseController implements SetStateApi {
                   .map(action ->
                     new AutomationActionData(action.id(), action.value())
                   )
-                  .toList()
+                  .toList(),
+                existing.data().enabled()
               )
             ),
           () -> existing.delete()

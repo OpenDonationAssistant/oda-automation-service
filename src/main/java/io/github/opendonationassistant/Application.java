@@ -25,7 +25,7 @@ import java.util.Map;
 @OpenAPIDefinition(
   info = @Info(
     title = "ODA Automation Service",
-    version = "0.3.0",
+    version = "0.4.0",
     license = @License(
       name = "AGPL-3.0",
       url = "https://www.gnu.org/licenses/agpl-3.0.en.html"

@@ -52,7 +52,8 @@ public class IterationTest {
       "name",
       "testuser",
       List.of(triggerData),
-      List.of(actionData)
+      List.of(actionData),
+      true
     );
     AutomationRule rule = new AutomationRule(rules, triggers, actions, data);
 
@@ -90,7 +91,8 @@ public class IterationTest {
       "name",
       "testuser",
       List.of(),
-      List.of(actionData)
+      List.of(actionData),
+      true
     );
     AutomationRule rule = new AutomationRule(rules, triggers, actions, data);
 
@@ -131,7 +133,8 @@ public class IterationTest {
       "name",
       "testuser",
       List.of(firstTriggerData, secondTriggerData),
-      List.of(actionData)
+      List.of(actionData),
+      true
     );
     AutomationRule rule = new AutomationRule(rules, triggers, actions, data);
 

@@ -55,7 +55,7 @@ public class AutomationRuleRepository {
     List<AutomationActionData> actions
   ) {
     repository.save(
-      new AutomationRuleData(id, name, recipientId, triggers, actions)
+      new AutomationRuleData(id, name, recipientId, triggers, actions, true)
     );
   }
 }
