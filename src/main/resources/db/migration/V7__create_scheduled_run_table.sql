@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS scheduled_run (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    time TIMESTAMP NOT NULL,
+    schedule JSONB NOT NULL,
+    done BOOLEAN NOT NULL DEFAULT FALSE
+);
