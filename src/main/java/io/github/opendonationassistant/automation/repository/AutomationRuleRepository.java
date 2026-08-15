@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Singleton
 public class AutomationRuleRepository {
@@ -26,12 +27,11 @@ public class AutomationRuleRepository {
     this.actionFactory = actionFactory;
   }
 
-  public List<AutomationRule> listByRecipientId(String recipientId) {
+  public Stream<AutomationRule> listByRecipientId(String recipientId) {
     return repository
       .getByRecipientId(recipientId)
       .stream()
-      .map(this::convert)
-      .toList();
+      .map(this::convert);
   }
 
   private AutomationRule convert(AutomationRuleData data) {
@@ -52,10 +52,11 @@ public class AutomationRuleRepository {
     String id,
     String name,
     List<AutomationTriggerData> triggers,
-    List<AutomationActionData> actions
+    List<AutomationActionData> actions,
+    boolean enabled
   ) {
     repository.save(
-      new AutomationRuleData(id, name, recipientId, triggers, actions, true)
+      new AutomationRuleData(id, name, recipientId, triggers, actions, enabled)
     );
   }
 }

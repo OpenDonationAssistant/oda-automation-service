@@ -101,6 +101,7 @@ public class SetStateTest {
     );
 
     setState.setState(auth, updateCommand);
+
     @NonNull
     final Optional<AutomationDto> state = viewController
       .getState(auth)

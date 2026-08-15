@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Controller
 public class SetState extends BaseController implements SetStateApi {
@@ -114,9 +115,8 @@ public class SetState extends BaseController implements SetStateApi {
   private void updateRules(String recipientId, SetStateCommand command) {
     final List<AutomationRule> existingRules = rules.listByRecipientId(
       recipientId
-    );
+    ).toList();
     existingRules
-      .stream()
       .forEach(existing -> {
         final Optional<AutomationRuleDto> updatedRule = command
           .rules()
@@ -178,7 +178,8 @@ public class SetState extends BaseController implements SetStateApi {
             .stream()
             .map(action -> new AutomationActionData(action.id(), action.value())
             )
-            .toList()
+            .toList(),
+          rule.enabled()
         )
       );
   }

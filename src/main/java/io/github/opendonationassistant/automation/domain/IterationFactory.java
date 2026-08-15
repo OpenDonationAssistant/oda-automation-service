@@ -26,7 +26,10 @@ public class IterationFactory {
   }
 
   public Iteration create(String recipientId, Object source) {
-    var rules = ruleRepository.listByRecipientId(recipientId);
+    var rules = ruleRepository
+      .listByRecipientId(recipientId)
+      .filter(it -> it.data().enabled())
+      .toList();
     var variables = variableRepository.listByRecipientId(recipientId);
     var iteration = new Iteration(recipientId, source, variables, rules);
     final Supplier<Map<String, ?>> logSupplier = () -> {

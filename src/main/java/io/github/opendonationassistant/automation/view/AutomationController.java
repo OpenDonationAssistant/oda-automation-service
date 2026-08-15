@@ -58,7 +58,6 @@ public class AutomationController implements AutomationOperationsApi {
     return HttpResponse.ok(
       rules
         .listByRecipientId(ownerId.get())
-        .stream()
         .map(this::convert)
         .toList()
     );
@@ -103,7 +102,6 @@ public class AutomationController implements AutomationOperationsApi {
       new AutomationDto(
         rules
           .listByRecipientId(ownerId.get())
-          .stream()
           .map(this::convert)
           .toList(),
         variables

@@ -33,7 +33,7 @@ public class AutomationRuleRepositoryTest {
     @Given AutomationTriggerData trigger,
     @Given AutomationActionData action
   ) {
-    repository.create(recipientId, id, name, List.of(trigger), List.of(action));
+    repository.create(recipientId, id, name, List.of(trigger), List.of(action), true);
 
     final Optional<AutomationRule> optionallyCreated =
       repository.getByRecipientIdAndRuleId(recipientId, id);

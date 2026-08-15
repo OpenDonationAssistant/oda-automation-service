@@ -42,7 +42,7 @@ public class SetEnabledTest {
     @Given AutomationTriggerData trigger,
     @Given AutomationActionData action
   ) {
-    repository.create(recipientId, id, name, List.of(trigger), List.of(action));
+    repository.create(recipientId, id, name, List.of(trigger), List.of(action), true);
     var auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(
       Map.of("preferred_username", recipientId)
@@ -74,7 +74,7 @@ public class SetEnabledTest {
     @Given AutomationTriggerData trigger,
     @Given AutomationActionData action
   ) {
-    repository.create(recipientId, id, name, List.of(trigger), List.of(action));
+    repository.create(recipientId, id, name, List.of(trigger), List.of(action), true);
     var auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(
       Map.of("preferred_username", otherRecipientId)
