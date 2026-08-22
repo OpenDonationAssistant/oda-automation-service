@@ -10,7 +10,10 @@ public class ScheduledRun {
   private final ScheduledRunData data;
   private final ScheduledRunDataRepository repository;
 
-  public ScheduledRun(ScheduledRunData data, ScheduledRunDataRepository repository) {
+  public ScheduledRun(
+    ScheduledRunData data,
+    ScheduledRunDataRepository repository
+  ) {
     this.data = data;
     this.repository = repository;
   }
