@@ -39,9 +39,19 @@ public class TokenSettingsChangedHandler
     String system,
     boolean enabled,
     boolean deleted,
-    Map<String, Object> settings
+    Map<String, Object> settings,
+    TokenEvent event
   )
     implements HasRecipientId {}
+
+  @Serdeable
+  public static enum TokenEvent {
+    TOKEN_CREATED,
+    TOKEN_UPDATED,
+    SETTINGS_CHANGED,
+    TOKEN_TOGGLED,
+    TOKEN_DELETED,
+  }
 
   @Override
   public void handle(TokenSettingsChanged message) throws IOException {
@@ -53,6 +63,18 @@ public class TokenSettingsChangedHandler
           uuid.generate().toString(),
           "tokenId",
           message.id(),
+          "string"
+        ),
+        new Variable(
+          uuid.generate().toString(),
+          "event",
+          message.event().name(),
+          "string"
+        ),
+        new Variable(
+          uuid.generate().toString(),
+          "tokenType",
+          message.type(),
           "string"
         )
       )

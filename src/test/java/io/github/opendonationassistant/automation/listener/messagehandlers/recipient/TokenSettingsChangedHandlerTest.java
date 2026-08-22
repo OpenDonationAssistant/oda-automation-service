@@ -1,8 +1,8 @@
 package io.github.opendonationassistant.automation.listener.messagehandlers.recipient;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -37,7 +37,8 @@ public class TokenSettingsChangedHandlerTest {
       "Twitch",
       true,
       false,
-      Map.of("channel", "test")
+      Map.of("channel", "test"),
+      TokenSettingsChangedHandler.TokenEvent.TOKEN_CREATED
     );
 
     handler.handle(message);
@@ -48,7 +49,7 @@ public class TokenSettingsChangedHandlerTest {
     Event capturedEvent = eventCaptor.getValue();
     assertEquals("token-1", capturedEvent.id());
     assertEquals("AuthUpdated", capturedEvent.type());
-    assertEquals(1, capturedEvent.variables().size());
+    assertEquals(3, capturedEvent.variables().size());
 
     var tokenIdVar = capturedEvent.variables().get(0);
     assertEquals("tokenId", tokenIdVar.name());
@@ -56,5 +57,19 @@ public class TokenSettingsChangedHandlerTest {
     assertEquals("string", tokenIdVar.type());
     assertNotNull(tokenIdVar.id());
     assertFalse(tokenIdVar.id().isEmpty());
+
+    var eventVar = capturedEvent.variables().get(1);
+    assertEquals("event", eventVar.name());
+    assertEquals("TOKEN_CREATED", eventVar.value());
+    assertEquals("string", eventVar.type());
+    assertNotNull(eventVar.id());
+    assertFalse(eventVar.id().isEmpty());
+
+    var tokenTypeVar = capturedEvent.variables().get(2);
+    assertEquals("tokenType", tokenTypeVar.name());
+    assertEquals("refreshToken", tokenTypeVar.value());
+    assertEquals("string", tokenTypeVar.type());
+    assertNotNull(tokenTypeVar.id());
+    assertFalse(tokenTypeVar.id().isEmpty());
   }
 }
