@@ -3,6 +3,7 @@ package io.github.opendonationassistant.automation.domain;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.IVariable;
+import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,18 +19,21 @@ public class Iteration {
   private final Object source;
   private final List<IVariable<?>> variables;
   private final List<AutomationRule> rules;
+  private final AutomationMetrics metrics;
 
   public Iteration(
     String recipientId,
     Object source,
     List<AutomationVariable<?>> variables,
-    List<AutomationRule> rules
+    List<AutomationRule> rules,
+    AutomationMetrics metrics
   ) {
     this.recipientId = recipientId;
     this.source = source;
     this.variables = new ArrayList<>();
     this.variables.addAll(variables);
     this.rules = rules;
+    this.metrics = metrics;
   }
 
   public String recipientId() {
@@ -71,6 +75,7 @@ public class Iteration {
       return output;
     };
     log.debug("Running iteration", logSupplier);
+    metrics.iterationRun(source);
     rules.forEach(rule ->
       rule
         .getTriggers()

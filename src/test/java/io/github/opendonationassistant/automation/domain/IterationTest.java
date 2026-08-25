@@ -6,6 +6,7 @@ import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.action.PinTwitchMessageAction.SendAndPinChatMessageCommand;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
+import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
@@ -13,6 +14,7 @@ import io.github.opendonationassistant.automation.repository.AutomationTriggerDa
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
 import io.github.opendonationassistant.rabbit.RabbitClient;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
@@ -30,6 +32,7 @@ public class IterationTest {
   RabbitClient rabbit = Mockito.mock(RabbitClient.class);
   TriggerFactory triggers = Mockito.spy(new TriggerFactory());
   ActionFactory actions = Mockito.spy(new ActionFactory(variables, rabbit));
+  AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
 
   @Test
   public void testRunningActionIfTriggerFired() {
@@ -61,7 +64,8 @@ public class IterationTest {
       "testuser",
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
-      List.of(rule)
+      List.of(rule),
+      metrics
     ).run();
     verify(rabbit).sendCommand(
       new SendAndPinChatMessageCommand(
@@ -100,7 +104,8 @@ public class IterationTest {
       "testuser",
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
-      List.of(rule)
+      List.of(rule),
+      metrics
     ).run();
 
     Mockito.verifyNoInteractions(rabbit);
@@ -142,7 +147,8 @@ public class IterationTest {
       "testuser",
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
-      List.of(rule)
+      List.of(rule),
+      metrics
     ).run();
     Mockito.verifyNoInteractions(rabbit);
   }

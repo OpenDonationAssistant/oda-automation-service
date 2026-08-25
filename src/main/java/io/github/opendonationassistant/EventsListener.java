@@ -1,5 +1,6 @@
 package io.github.opendonationassistant;
 
+import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.events.MessageProcessor;
 import io.github.opendonationassistant.rabbit.Exchange;
 import io.micronaut.messaging.annotation.MessageHeader;
@@ -41,10 +42,12 @@ public class EventsListener {
   );
 
   private final MessageProcessor processor;
+  private final AutomationMetrics metrics;
 
   @Inject
-  public EventsListener(MessageProcessor processor) {
+  public EventsListener(MessageProcessor processor, AutomationMetrics metrics) {
     this.processor = processor;
+    this.metrics = metrics;
   }
 
   @Queue(QUEUE_NAME)
@@ -53,6 +56,7 @@ public class EventsListener {
     byte[] message,
     RabbitAcknowledgement ack
   ) throws IOException {
+    metrics.eventHandled(type);
     processor.process(type, message, ack);
   }
 }
