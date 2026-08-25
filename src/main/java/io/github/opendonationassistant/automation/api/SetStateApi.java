@@ -9,6 +9,7 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public interface SetStateApi {
@@ -24,6 +25,6 @@ public interface SetStateApi {
   )
   HttpResponse<Void> setState(
     Authentication auth,
-    @Body SetStateCommand command
+    @Valid @Body SetStateCommand command
   );
 }

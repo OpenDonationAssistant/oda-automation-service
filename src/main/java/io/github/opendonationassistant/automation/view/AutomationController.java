@@ -14,10 +14,12 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.validation.Validated;
 import java.util.List;
 import java.util.Optional;
 
 @Controller
+@Validated
 public class AutomationController implements AutomationOperationsApi {
 
   private AutomationVariableRepository variables;

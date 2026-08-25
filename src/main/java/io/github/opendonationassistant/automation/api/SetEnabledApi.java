@@ -9,6 +9,7 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public interface SetEnabledApi {
@@ -25,6 +26,6 @@ public interface SetEnabledApi {
   @ApiResponse(responseCode = "404", description = "Rule not found")
   HttpResponse<Void> setEnabled(
     Authentication auth,
-    @Body SetEnabledCommand command
+    @Valid @Body SetEnabledCommand command
   );
 }

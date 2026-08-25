@@ -10,11 +10,15 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 import java.util.Optional;
 
 @Controller
+@Validated
 public class SetEnabled extends BaseController implements SetEnabledApi {
 
   private final ODALogger log = new ODALogger(this);
@@ -29,7 +33,7 @@ public class SetEnabled extends BaseController implements SetEnabledApi {
   @Override
   public HttpResponse<Void> setEnabled(
     Authentication auth,
-    @Body SetEnabledCommand command
+    @Valid @Body SetEnabledCommand command
   ) {
     Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -52,5 +56,5 @@ public class SetEnabled extends BaseController implements SetEnabledApi {
   }
 
   @Serdeable
-  public static record SetEnabledCommand(String ruleId) {}
+  public static record SetEnabledCommand(@NotBlank String ruleId) {}
 }

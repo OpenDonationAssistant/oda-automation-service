@@ -19,7 +19,10 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.serde.annotation.Serdeable;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Controller
+@Validated
 public class SetState extends BaseController implements SetStateApi {
 
   private final ODALogger log = new ODALogger(this);
@@ -45,7 +49,7 @@ public class SetState extends BaseController implements SetStateApi {
 
   public HttpResponse<Void> setState(
     Authentication auth,
-    @Body SetStateCommand command
+    @Valid @Body SetStateCommand command
   ) {
     Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
@@ -186,7 +190,7 @@ public class SetState extends BaseController implements SetStateApi {
 
   @Serdeable
   public static record SetStateCommand(
-    List<AutomationRuleDto> rules,
-    List<AutomationVariableDto> variables
+    @Valid @NotNull List<AutomationRuleDto> rules,
+    @Valid @NotNull List<AutomationVariableDto> variables
   ) {}
 }

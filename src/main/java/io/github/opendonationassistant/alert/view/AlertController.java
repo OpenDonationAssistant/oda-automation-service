@@ -12,6 +12,7 @@ import io.micronaut.data.repository.jpa.criteria.PredicateSpecification;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.validation.Validated;
 import jakarta.persistence.criteria.Predicate;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 
 @Controller
+@Validated
 public class AlertController extends BaseController implements GetAlertsApi {
 
   private final AlertDataRepository repository;
