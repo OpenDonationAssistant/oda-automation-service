@@ -23,6 +23,7 @@ public class TriggerFactory {
       case "donationgoal-filled" -> new FilledDonationGoalTrigger(data);
       case "stream-started" -> new StreamStartedTrigger(data);
       case "channel-raided" -> new ChannelRaidedTrigger(data);
+      case "command" -> new CommandTrigger(data);
       default -> new NeverTrigger(data);
     };
   }
