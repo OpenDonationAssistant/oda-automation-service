@@ -48,8 +48,8 @@ public class TriggerRule extends BaseController implements TriggerRuleApi {
       command.id()
     );
     if (rule.isEmpty()) {
-      log.info("Rule not found", Map.of("ruleId", command.id()));
-      return HttpResponse.notFound();
+      log.debug("Rule not found", Map.of("ruleId", command.id()));
+      return HttpResponse.unauthorized();
     }
     log.info("Triggering rule by command", Map.of("command", command));
     iterationFactory.create(ownerId.get(), command).run();

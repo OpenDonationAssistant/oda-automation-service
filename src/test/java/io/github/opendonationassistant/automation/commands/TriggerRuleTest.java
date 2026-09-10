@@ -57,14 +57,14 @@ public class TriggerRuleTest {
     );
 
     var before = registry
-      .counter("automation.iteration.runs", "source", "Command")
+      .counter("automation.iteration.runs", "source", "TriggerRuleCommand")
       .count();
     var response = triggerRule.triggerRule(
       auth,
       new TriggerRuleCommand(id, "nickname", "system", Map.of())
     );
     var after = registry
-      .counter("automation.iteration.runs", "source", "Command")
+      .counter("automation.iteration.runs", "source", "TriggerRuleCommand")
       .count();
 
     assertEquals(200, response.getStatus().getCode());
@@ -100,9 +100,7 @@ public class TriggerRuleTest {
   }
 
   @Test
-  public void testTriggeringRuleWithoutOwnerId(
-    @Given String id
-  ) {
+  public void testTriggeringRuleWithoutOwnerId(@Given String id) {
     var auth = mock(Authentication.class);
     when(auth.getAttributes()).thenReturn(Map.of());
 
@@ -114,3 +112,4 @@ public class TriggerRuleTest {
     assertEquals(401, response.getStatus().getCode());
   }
 }
+
