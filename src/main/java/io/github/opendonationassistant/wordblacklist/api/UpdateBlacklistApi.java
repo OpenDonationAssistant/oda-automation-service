@@ -7,6 +7,7 @@ import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
@@ -29,6 +30,9 @@ public interface UpdateBlacklistApi {
   )
   HttpResponse<WordFilterData> updateBlacklist(
     Authentication auth,
-    @Valid @Body List<String> words
+    @Valid @Body UpdateBlacklistCommand command
   );
+
+  @Serdeable
+  public static record UpdateBlacklistCommand(List<String> words) {}
 }

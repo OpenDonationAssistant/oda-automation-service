@@ -8,6 +8,7 @@ import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -30,12 +31,12 @@ public class UpdateBlacklist
   @Override
   public HttpResponse<WordFilterData> updateBlacklist(
     Authentication auth,
-    @Valid @Body List<String> words
+    @Valid @Body UpdateBlacklistCommand command
   ) {
     Optional<String> ownerId = getOwnerId(auth);
     return ownerId
       .map(repository::getByRecipientId)
-      .map(filter -> filter.replaceWords(words).save())
+      .map(filter -> filter.replaceWords(command.words()).save())
       .map(HttpResponse::ok)
       .orElse(HttpResponse.unauthorized());
   }
