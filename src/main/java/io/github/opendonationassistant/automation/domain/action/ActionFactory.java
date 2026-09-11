@@ -36,6 +36,7 @@ public class ActionFactory {
       case "run-reel" -> new RunReelAction(data, recipientId, rabbit);
       case "pin-twitch-message" -> new PinTwitchMessageAction(data, rabbit);
       case "twitch-shoutout" -> new TwitchShoutoutAction(data, rabbit);
+      case "twitch-announce" -> new TwitchAnnounceAction(data, rabbit);
       default -> new EmptyAutomationAction(data);
     };
   }
