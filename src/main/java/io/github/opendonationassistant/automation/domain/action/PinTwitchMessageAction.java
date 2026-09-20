@@ -10,6 +10,8 @@ import java.util.Map;
 
 public class PinTwitchMessageAction extends AutomationAction {
 
+  public static final String ID = "pin-twitch-message";
+
   private final ODALogger log = new ODALogger(this);
   private final RabbitClient rabbitClient;
 

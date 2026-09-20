@@ -12,6 +12,8 @@ import java.util.Optional;
 
 public class TwitchShoutoutAction extends AutomationAction {
 
+  public static final String ID = "twitch-shoutout";
+
   private final ODALogger log = new ODALogger(this);
   private final RabbitClient rabbitClient;
 

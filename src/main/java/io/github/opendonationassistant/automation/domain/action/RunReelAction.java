@@ -10,6 +10,8 @@ import java.util.Map;
 
 public class RunReelAction extends AutomationAction {
 
+  public static final String ID = "run-reel";
+
   private final ODALogger log = new ODALogger(this);
   private final RabbitClient rabbit;
   private final String recipientId;

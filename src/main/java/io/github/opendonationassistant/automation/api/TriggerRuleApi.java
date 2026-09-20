@@ -1,9 +1,5 @@
 package io.github.opendonationassistant.automation.api;
 
-import java.util.Map;
-
-import org.jspecify.annotations.Nullable;
-
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Post;
@@ -15,6 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 public interface TriggerRuleApi {
@@ -35,11 +33,10 @@ public interface TriggerRuleApi {
   );
 
   @Serdeable
-  public record TriggerRuleCommand(
+  public static record TriggerRuleCommand(
     @NotBlank String id,
     @Nullable String nickname,
     @Nullable String system,
     @Nullable Map<String, String> variables
   ) {}
 }
-

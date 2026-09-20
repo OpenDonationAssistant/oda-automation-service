@@ -11,6 +11,8 @@ import org.jspecify.annotations.Nullable;
 
 public class TwitchAnnounceAction extends AutomationAction {
 
+  public static final String ID = "twitch-announce";
+
   private final ODALogger log = new ODALogger(this);
   private final RabbitClient rabbitClient;
 

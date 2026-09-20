@@ -20,7 +20,11 @@ public class ScheduledRunRepository {
     this.repository = repository;
   }
 
-  public ScheduledRun create(String name, Instant time, Map<String, Object> schedule) {
+  public ScheduledRun create(
+    String name,
+    Instant time,
+    Map<String, Object> schedule
+  ) {
     var data = new ScheduledRunData(
       Generators.timeBasedEpochGenerator().generate(),
       name,

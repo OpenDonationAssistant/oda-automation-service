@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public class RefreshDonationGoalAction extends AutomationAction {
 
+  public static final String ID = "refresh-donation-goal";
+
   private final ODALogger log = new ODALogger(this);
 
   public RefreshDonationGoalAction(AutomationActionData data) {

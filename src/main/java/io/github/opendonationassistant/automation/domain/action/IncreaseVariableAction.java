@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public class IncreaseVariableAction extends AutomationAction {
 
+  public static final String ID = "increase-variable";
+
   private String recipientId;
   private AutomationVariableRepository variables;
 
