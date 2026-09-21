@@ -9,7 +9,7 @@
   <logger name="com.zaxxer.hikari" level="WARN"/>
   <logger name="io.micronaut.logging.PropertiesLoggingLevelsConfigurer" level="WARN"/>
   <logger name="io.micronaut.flyway.AbstractFlywayMigration" level="WARN"/>
-  <root level="info">
+  <root level="debug">
     <appender-ref ref="STDOUT"/>
   </root>
 </configuration>
