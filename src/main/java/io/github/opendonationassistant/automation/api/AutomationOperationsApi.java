@@ -12,6 +12,8 @@ import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -27,7 +29,34 @@ public interface AutomationOperationsApi {
   @Get("/automation/variables")
   @Operation(
     summary = "List automation variables",
-    description = "Retrieves paginated automation variables for the authenticated user"
+    description = "Retrieves paginated automation variables for the authenticated user",
+    parameters = {
+      @Parameter(
+        name = "page",
+        in = ParameterIn.QUERY,
+        description = "Zero-indexed page number (0-based)",
+        required = false,
+        schema = @Schema(
+          implementation = Integer.class,
+          type = "integer",
+          format = "int32",
+          example = "0",
+          minimum = "0"
+        )
+      ),
+      @Parameter(
+        name = "size",
+        in = ParameterIn.QUERY,
+        schema = @Schema(implementation = Integer.class),
+        description = "Number of items per page"
+      ),
+      @Parameter(
+        name = "sort",
+        schema = @Schema(implementation = String.class),
+        in = ParameterIn.QUERY,
+        description = "Sorting criteria in format: property,asc|desc"
+      ),
+    }
   )
   @ApiResponse(
     responseCode = "200",
@@ -49,7 +78,34 @@ public interface AutomationOperationsApi {
   @Get("/automation/rules")
   @Operation(
     summary = "List automation rules",
-    description = "Retrieves paginated automation rules for the authenticated user"
+    description = "Retrieves paginated automation rules for the authenticated user",
+    parameters = {
+      @Parameter(
+        name = "page",
+        in = ParameterIn.QUERY,
+        description = "Zero-indexed page number (0-based)",
+        required = false,
+        schema = @Schema(
+          implementation = Integer.class,
+          type = "integer",
+          format = "int32",
+          example = "0",
+          minimum = "0"
+        )
+      ),
+      @Parameter(
+        name = "size",
+        in = ParameterIn.QUERY,
+        schema = @Schema(implementation = Integer.class),
+        description = "Number of items per page"
+      ),
+      @Parameter(
+        name = "sort",
+        schema = @Schema(implementation = String.class),
+        in = ParameterIn.QUERY,
+        description = "Sorting criteria in format: property,asc|desc"
+      ),
+    }
   )
   @ApiResponse(
     responseCode = "200",
@@ -101,3 +157,4 @@ public interface AutomationOperationsApi {
     );
   }
 }
+
