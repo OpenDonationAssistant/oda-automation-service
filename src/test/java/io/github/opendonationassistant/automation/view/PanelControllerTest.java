@@ -3,13 +3,10 @@ package io.github.opendonationassistant.automation.view;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import io.github.opendonationassistant.automation.api.CreatePanelApi;
-import io.github.opendonationassistant.automation.api.UpdatePanelApi;
 import io.github.opendonationassistant.automation.dto.PanelDto;
 import io.github.opendonationassistant.automation.dto.PanelDto.PanelCardDto;
 import io.github.opendonationassistant.automation.repository.Panel;
@@ -18,13 +15,14 @@ import io.github.opendonationassistant.automation.repository.PanelData.PanelCard
 import io.github.opendonationassistant.automation.repository.PanelDataRepository;
 import io.github.opendonationassistant.automation.repository.PanelRepository;
 import io.github.opendonationassistant.testutils.AuthenticationGenerator;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
 import io.micronaut.security.authentication.Authentication;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -83,24 +81,44 @@ public class PanelControllerTest {
   @Test
   public void testListPanelsReturnsPanelsForOwner() {
     var auth = AuthenticationGenerator.forUser(OWNER_ID);
-    when(repository.listByRecipientId(any())).thenReturn(
-      Stream.of(panel(PANEL_ID, PANEL_NAME))
+    var pageable = Pageable.from(0, 20);
+    when(repository.listByRecipientId(any(), any())).thenReturn(
+      Page.of(List.of(panel(PANEL_ID, PANEL_NAME)), pageable, 1L)
     );
 
-    HttpResponse<List<PanelDto>> response = controller.listPanels(auth);
+    HttpResponse<Page<PanelDto>> response = controller.listPanels(
+      auth,
+      pageable
+    );
 
     assertEquals(HttpStatus.OK, response.getStatus());
-    List<PanelDto> body = Optional.ofNullable(response.body()).orElseThrow();
-    assertEquals(1, body.size());
-    assertEquals(PANEL_ID, body.get(0).id());
-    verify(repository).listByRecipientId(OWNER_ID);
+    Page<PanelDto> body = Optional.ofNullable(response.body()).orElseThrow();
+    assertEquals(1, body.getContent().size());
+    assertEquals(PANEL_ID, body.getContent().get(0).id());
+    verify(repository).listByRecipientId(OWNER_ID, pageable);
+  }
+
+  @Test
+  public void testListPanelsDefaultsToFirstPageWhenUnpaged() {
+    var auth = AuthenticationGenerator.forUser(OWNER_ID);
+    when(repository.listByRecipientId(any(), any())).thenReturn(
+      Page.empty()
+    );
+
+    HttpResponse<Page<PanelDto>> response = controller.listPanels(
+      auth,
+      Pageable.unpaged()
+    );
+
+    assertEquals(HttpStatus.OK, response.getStatus());
+    verify(repository).listByRecipientId(OWNER_ID, Pageable.from(0, 20));
   }
 
   @Test
   public void testAllEndpointsReturnUnauthorizedWithoutOwner() {
     assertEquals(
       HttpStatus.UNAUTHORIZED,
-      controller.listPanels(unauthenticated()).getStatus()
+      controller.listPanels(unauthenticated(), Pageable.unpaged()).getStatus()
     );
     assertEquals(
       HttpStatus.UNAUTHORIZED,

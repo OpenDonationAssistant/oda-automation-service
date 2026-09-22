@@ -6,11 +6,15 @@ import io.github.opendonationassistant.automation.repository.PanelRepository;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
+import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import java.util.Optional;
 
+@Controller
+@Validated
 public class CreatePanel extends BaseController implements CreatePanelApi {
 
   private final PanelRepository panels;

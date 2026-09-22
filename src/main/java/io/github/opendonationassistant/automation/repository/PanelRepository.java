@@ -1,6 +1,8 @@
 package io.github.opendonationassistant.automation.repository;
 
 import io.github.opendonationassistant.automation.repository.PanelData.PanelCardData;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
@@ -20,6 +22,13 @@ public class PanelRepository {
 
   public Stream<Panel> listByRecipientId(String recipientId) {
     return repository.getByRecipientId(recipientId).stream().map(this::convert);
+  }
+
+  public Page<Panel> listByRecipientId(
+    String recipientId,
+    Pageable pageable
+  ) {
+    return repository.findByRecipientId(recipientId, pageable).map(this::convert);
   }
 
   public Optional<Panel> getByRecipientIdAndId(String recipientId, String id) {

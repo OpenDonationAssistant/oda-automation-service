@@ -4,12 +4,13 @@ import io.github.opendonationassistant.automation.api.PanelsApi;
 import io.github.opendonationassistant.automation.dto.PanelDto;
 import io.github.opendonationassistant.automation.repository.PanelRepository;
 import io.github.opendonationassistant.commons.micronaut.BaseController;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.validation.Validated;
 import jakarta.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -24,16 +25,21 @@ public class PanelController extends BaseController implements PanelsApi {
   }
 
   @Override
-  public HttpResponse<List<PanelDto>> listPanels(Authentication auth) {
+  public HttpResponse<Page<PanelDto>> listPanels(
+    Authentication auth,
+    Pageable pageable
+  ) {
     Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
+    if (pageable.isUnpaged()) {
+      pageable = Pageable.from(0, 20);
+    }
     return HttpResponse.ok(
       panels
-        .listByRecipientId(ownerId.get())
+        .listByRecipientId(ownerId.get(), pageable)
         .map(panel -> PanelDto.from(panel.data()))
-        .toList()
     );
   }
 
