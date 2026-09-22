@@ -3,6 +3,8 @@ package io.github.opendonationassistant.automation.repository;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
@@ -32,6 +34,13 @@ public class AutomationRuleRepository {
       .getByRecipientId(recipientId)
       .stream()
       .map(this::convert);
+  }
+
+  public Page<AutomationRule> listByRecipientId(
+    String recipientId,
+    Pageable pageable
+  ) {
+    return repository.findByRecipientId(recipientId, pageable).map(this::convert);
   }
 
   private AutomationRule convert(AutomationRuleData data) {

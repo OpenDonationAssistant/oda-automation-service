@@ -3,17 +3,19 @@ package io.github.opendonationassistant.automation.api;
 import io.github.opendonationassistant.automation.dto.AutomationDto;
 import io.github.opendonationassistant.automation.dto.AutomationRuleDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
+import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
 import java.util.Optional;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -25,40 +27,46 @@ public interface AutomationOperationsApi {
   @Get("/automation/variables")
   @Operation(
     summary = "List automation variables",
-    description = "Retrieves all automation variables for the authenticated user"
+    description = "Retrieves paginated automation variables for the authenticated user"
   )
   @ApiResponse(
     responseCode = "200",
-    description = "List of automation variables",
+    description = "Paginated list of automation variables",
     content = @Content(
       mediaType = "application/json",
-      schema = @Schema(implementation = AutomationVariableDto[].class)
+      schema = @Schema(implementation = ListVariablesResponse.class)
     )
   )
   @ApiResponse(
     responseCode = "401",
     description = "Unauthorized - user not authenticated"
   )
-  HttpResponse<List<AutomationVariableDto>> listVariables(Authentication auth);
+  HttpResponse<Page<AutomationVariableDto>> listVariables(
+    Authentication auth,
+    Pageable pageable
+  );
 
   @Get("/automation/rules")
   @Operation(
     summary = "List automation rules",
-    description = "Retrieves all automation rules for the authenticated user"
+    description = "Retrieves paginated automation rules for the authenticated user"
   )
   @ApiResponse(
     responseCode = "200",
-    description = "List of automation rules",
+    description = "Paginated list of automation rules",
     content = @Content(
       mediaType = "application/json",
-      schema = @Schema(implementation = AutomationRuleDto[].class)
+      schema = @Schema(implementation = ListAutomationsResponse.class)
     )
   )
   @ApiResponse(
     responseCode = "401",
     description = "Unauthorized - user not authenticated"
   )
-  HttpResponse<List<AutomationRuleDto>> listAutomations(Authentication auth);
+  HttpResponse<Page<AutomationRuleDto>> listAutomations(
+    Authentication auth,
+    Pageable pageable
+  );
 
   @Get("/automation/")
   @Operation(
@@ -78,6 +86,14 @@ public interface AutomationOperationsApi {
     description = "Unauthorized - user not authenticated"
   )
   HttpResponse<AutomationDto> getState(Authentication auth);
+
+  @Serdeable
+  public static interface ListVariablesResponse
+    extends Page<AutomationVariableDto> {}
+
+  @Serdeable
+  public static interface ListAutomationsResponse
+    extends Page<AutomationRuleDto> {}
 
   default Optional<String> getOwnerId(Authentication auth) {
     return Optional.ofNullable(

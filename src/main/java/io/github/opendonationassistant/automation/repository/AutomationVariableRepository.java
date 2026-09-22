@@ -6,6 +6,8 @@ import io.github.opendonationassistant.automation.domain.variable.AutomationNumb
 import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.micronaut.core.util.StringUtils;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -44,6 +46,13 @@ public class AutomationVariableRepository {
           return list1;
         }
       );
+  }
+
+  public Page<AutomationVariable<?>> listByRecipientId(
+    String recipientId,
+    Pageable pageable
+  ) {
+    return repository.findByRecipientId(recipientId, pageable).map(this::convert);
   }
 
   public Optional<AutomationVariable<?>> getById(

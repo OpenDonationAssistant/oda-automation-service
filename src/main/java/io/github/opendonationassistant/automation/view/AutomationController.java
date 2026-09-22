@@ -10,12 +10,13 @@ import io.github.opendonationassistant.automation.dto.AutomationTriggerDto;
 import io.github.opendonationassistant.automation.dto.AutomationVariableDto;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
+import io.micronaut.data.model.Page;
+import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.validation.Validated;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -33,35 +34,38 @@ public class AutomationController implements AutomationOperationsApi {
     this.rules = rules;
   }
 
-  public HttpResponse<List<AutomationVariableDto>> listVariables(
-    Authentication auth
+  public HttpResponse<Page<AutomationVariableDto>> listVariables(
+    Authentication auth,
+    Pageable pageable
   ) {
     Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
+    if (pageable.isUnpaged()) {
+      pageable = Pageable.from(0, 20);
+    }
     return HttpResponse.ok(
       variables
-        .listByRecipientId(ownerId.get())
-        .stream()
+        .listByRecipientId(ownerId.get(), pageable)
         .map(this::convert)
-        .toList()
     );
   }
 
   @Get("/automation/rules")
-  public HttpResponse<List<AutomationRuleDto>> listAutomations(
-    Authentication auth
+  public HttpResponse<Page<AutomationRuleDto>> listAutomations(
+    Authentication auth,
+    Pageable pageable
   ) {
     final Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
+    if (pageable.isUnpaged()) {
+      pageable = Pageable.from(0, 20);
+    }
     return HttpResponse.ok(
-      rules
-        .listByRecipientId(ownerId.get())
-        .map(this::convert)
-        .toList()
+      rules.listByRecipientId(ownerId.get(), pageable).map(this::convert)
     );
   }
 
