@@ -4,6 +4,8 @@ import io.github.opendonationassistant.automation.dto.PanelDto.PanelCardDto;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
+@Secured(SecurityRule.IS_AUTHENTICATED)
 public interface CreatePanelApi {
   @Post("/panels/commands/create-panel")
   @Operation(
