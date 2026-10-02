@@ -41,6 +41,16 @@ public class ActionFactory {
         recipientId,
         variables
       );
+      case DecreaseVariableAction.ID -> new DecreaseVariableAction(
+        data,
+        recipientId,
+        variables
+      );
+      case ResetVariableAction.ID -> new ResetVariableAction(
+        data,
+        recipientId,
+        variables
+      );
       case RunReelAction.ID -> new RunReelAction(data, recipientId, rabbit);
       case PinTwitchMessageAction.ID -> new PinTwitchMessageAction(
         data,

@@ -13,7 +13,8 @@ import java.util.Optional;
 
 @Controller
 @Validated
-public class GetObsSettings extends BaseController
+public class GetObsSettings
+  extends BaseController
   implements GetObsSettingsApi {
 
   private final ObsSettingsRepository repository;
@@ -33,6 +34,6 @@ public class GetObsSettings extends BaseController
       .getByRecipientId(ownerId.get())
       .map(ObsSettingsDto::from)
       .map(HttpResponse::ok)
-      .orElse(HttpResponse.<ObsSettingsDto>notFound());
+      .orElse(HttpResponse.<ObsSettingsDto>unauthorized());
   }
 }

@@ -5,11 +5,11 @@ import io.github.opendonationassistant.automation.repository.AutomationActionDat
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import java.math.BigDecimal;
 
-public class IncreaseVariableAction extends AbstractVariableAction {
+public class DecreaseVariableAction extends AbstractVariableAction {
 
-  public static final String ID = "increase-variable";
+  public static final String ID = "decrease-variable";
 
-  public IncreaseVariableAction(
+  public DecreaseVariableAction(
     AutomationActionData data,
     String recipientId,
     AutomationVariableRepository variables
@@ -22,7 +22,7 @@ public class IncreaseVariableAction extends AbstractVariableAction {
     numberVariable()
       .ifPresent(variable ->
         variable.setValue(
-          variable.value().add(new BigDecimal(getAmount().orElse(0)))
+          variable.value().subtract(new BigDecimal(getAmount().orElse(0)))
         )
       );
   }
