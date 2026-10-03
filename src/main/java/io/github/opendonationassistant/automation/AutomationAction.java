@@ -2,6 +2,7 @@ package io.github.opendonationassistant.automation;
 
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
+import java.util.Optional;
 
 public abstract class AutomationAction {
 
@@ -13,6 +14,10 @@ public abstract class AutomationAction {
 
   public AutomationActionData data() {
     return data;
+  }
+
+  protected Optional<String> value(String name) {
+    return Optional.ofNullable((String) data().value().get(name));
   }
 
   public abstract void execute(Iteration iteration);

@@ -51,6 +51,15 @@ public class ActionFactory {
         recipientId,
         variables
       );
+      case SendTwitchMessageAction.ID -> new SendTwitchMessageAction(
+        data,
+        rabbit
+      );
+      case SendKickMessageAction.ID -> new SendKickMessageAction(data, rabbit);
+      case SendVKLiveMessageAction.ID -> new SendVKLiveMessageAction(
+        data,
+        rabbit
+      );
       case RunReelAction.ID -> new RunReelAction(data, recipientId, rabbit);
       case PinTwitchMessageAction.ID -> new PinTwitchMessageAction(
         data,
