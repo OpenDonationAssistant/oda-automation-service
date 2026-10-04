@@ -43,6 +43,16 @@ public class AutomationRuleRepository {
     return repository.findByRecipientId(recipientId, pageable).map(this::convert);
   }
 
+  public Page<AutomationRule> listByRecipientIdAndTrigger(
+    String recipientId,
+    String trigger,
+    Pageable pageable
+  ) {
+    return repository
+      .findByRecipientIdAndTrigger(recipientId, trigger, pageable)
+      .map(this::convert);
+  }
+
   private AutomationRule convert(AutomationRuleData data) {
     return new AutomationRule(repository, triggerFactory, actionFactory, data);
   }

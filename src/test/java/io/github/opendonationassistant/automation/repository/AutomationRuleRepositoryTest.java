@@ -3,9 +3,11 @@ package io.github.opendonationassistant.automation.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.opendonationassistant.automation.AutomationRule;
+import io.micronaut.data.model.Pageable;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
@@ -44,5 +46,58 @@ public class AutomationRuleRepositoryTest {
     assertEquals(name, created.data().name());
     assertEquals(List.of(trigger), created.data().triggers());
     assertEquals(List.of(action), created.data().actions());
+  }
+
+  @Test
+  public void testListByRecipientIdAndTriggerFiltersAndPaginates(
+    @Given String recipientId,
+    @Given String commandRuleId,
+    @Given String otherCommandRuleId,
+    @Given String streamRuleId,
+    @Given String name,
+    @Given AutomationActionData action
+  ) {
+    repository.create(
+      recipientId,
+      commandRuleId,
+      name,
+      List.of(new AutomationTriggerData("command", Map.of("ruleId", commandRuleId))),
+      List.of(action),
+      true
+    );
+    repository.create(
+      recipientId,
+      otherCommandRuleId,
+      name,
+      List.of(new AutomationTriggerData("command", Map.of("ruleId", otherCommandRuleId))),
+      List.of(action),
+      true
+    );
+    repository.create(
+      recipientId,
+      streamRuleId,
+      name,
+      List.of(new AutomationTriggerData("stream-started", Map.of())),
+      List.of(action),
+      true
+    );
+
+    final var firstPage = repository.listByRecipientIdAndTrigger(
+      recipientId,
+      "command",
+      Pageable.from(0, 1)
+    );
+
+    assertEquals(1, firstPage.getContent().size());
+    assertEquals(2L, firstPage.getTotalSize());
+
+    final var streamTriggered = repository.listByRecipientIdAndTrigger(
+      recipientId,
+      "stream-started",
+      Pageable.from(0, 20)
+    );
+
+    assertEquals(1, streamTriggered.getContent().size());
+    assertEquals(streamRuleId, streamTriggered.getContent().get(0).data().id());
   }
 }

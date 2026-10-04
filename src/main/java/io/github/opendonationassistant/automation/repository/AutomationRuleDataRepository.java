@@ -1,5 +1,6 @@
 package io.github.opendonationassistant.automation.repository;
 
+import io.micronaut.data.annotation.Query;
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
@@ -15,6 +16,20 @@ public interface AutomationRuleDataRepository
 
   public Page<AutomationRuleData> findByRecipientId(
     String recipientId,
+    Pageable pageable
+  );
+
+  @Query(
+    value = "SELECT * FROM automation.automationrule " +
+    "WHERE recipient_id = :recipientId " +
+    "AND triggers @> jsonb_build_array(jsonb_build_object('id', CAST(:trigger AS text)))",
+    countQuery = "SELECT COUNT(*) FROM automation.automationrule " +
+    "WHERE recipient_id = :recipientId " +
+    "AND triggers @> jsonb_build_array(jsonb_build_object('id', CAST(:trigger AS text)))"
+  )
+  public Page<AutomationRuleData> findByRecipientIdAndTrigger(
+    String recipientId,
+    String trigger,
     Pageable pageable
   );
 

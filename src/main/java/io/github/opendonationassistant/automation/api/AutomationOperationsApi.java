@@ -7,6 +7,7 @@ import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.rules.SecurityRule;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
 @Tag(
@@ -78,7 +80,7 @@ public interface AutomationOperationsApi {
   @Get("/automation/rules")
   @Operation(
     summary = "List automation rules",
-    description = "Retrieves paginated automation rules for the authenticated user",
+    description = "Retrieves paginated automation rules for the authenticated user, optionally filtered by trigger id",
     parameters = {
       @Parameter(
         name = "page",
@@ -105,6 +107,13 @@ public interface AutomationOperationsApi {
         in = ParameterIn.QUERY,
         description = "Sorting criteria in format: property,asc|desc"
       ),
+      @Parameter(
+        name = "trigger",
+        in = ParameterIn.QUERY,
+        required = false,
+        schema = @Schema(implementation = String.class),
+        description = "Filter rules that contain a trigger with this id (e.g. command, stream-started, channel-raided, donationgoal-filled)"
+      ),
     }
   )
   @ApiResponse(
@@ -121,6 +130,7 @@ public interface AutomationOperationsApi {
   )
   HttpResponse<Page<AutomationRuleDto>> listAutomations(
     Authentication auth,
+    @Nullable @QueryValue("trigger") String trigger,
     Pageable pageable
   );
 

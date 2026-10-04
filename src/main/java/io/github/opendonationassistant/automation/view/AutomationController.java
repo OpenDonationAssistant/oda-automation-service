@@ -18,6 +18,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.validation.Validated;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 
 @Controller
 @Validated
@@ -55,18 +56,25 @@ public class AutomationController implements AutomationOperationsApi {
   @Get("/automation/rules")
   public HttpResponse<Page<AutomationRuleDto>> listAutomations(
     Authentication auth,
+    @Nullable String trigger,
     Pageable pageable
   ) {
     final Optional<String> ownerId = getOwnerId(auth);
     if (ownerId.isEmpty()) {
       return HttpResponse.unauthorized();
     }
-    if (pageable.isUnpaged()) {
-      pageable = Pageable.from(0, 20);
-    }
-    return HttpResponse.ok(
-      rules.listByRecipientId(ownerId.get(), pageable).map(this::convert)
-    );
+    final Pageable effectivePageable = pageable.isUnpaged()
+      ? Pageable.from(0, 20)
+      : pageable;
+    final Page<AutomationRule> page =
+      trigger == null || trigger.isBlank()
+        ? rules.listByRecipientId(ownerId.get(), effectivePageable)
+        : rules.listByRecipientIdAndTrigger(
+          ownerId.get(),
+          trigger,
+          effectivePageable
+        );
+    return HttpResponse.ok(page.map(this::convert));
   }
 
   private AutomationVariableDto convert(AutomationVariable<?> variable) {
