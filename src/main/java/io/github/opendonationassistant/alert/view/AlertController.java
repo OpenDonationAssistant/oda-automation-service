@@ -55,13 +55,14 @@ public class AlertController extends BaseController implements GetAlertsApi {
     if (after != null) {
       conditions.add(
         where((root, builder) ->
-          builder.greaterThan(root.get("timestamp"), after)
+          builder.greaterThan(root.get("createdAt"), after)
         )
       );
     }
     if (before != null) {
       conditions.add(
-        where((root, builder) -> builder.lessThan(root.get("timestamp"), before)
+        where((root, builder) ->
+          builder.lessThan(root.get("createdAt"), before)
         )
       );
     }
