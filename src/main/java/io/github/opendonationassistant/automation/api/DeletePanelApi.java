@@ -1,6 +1,7 @@
 package io.github.opendonationassistant.automation.api;
 
 import io.micronaut.http.HttpResponse;
+import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Post;
 import io.micronaut.security.annotation.Secured;
 import io.micronaut.security.authentication.Authentication;
@@ -8,6 +9,7 @@ import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 @Secured(SecurityRule.IS_AUTHENTICATED)
@@ -24,7 +26,7 @@ public interface DeletePanelApi {
   )
   HttpResponse<Void> deletePanel(
     Authentication auth,
-    DeletePanelCommand command
+    @Valid @Body DeletePanelCommand command
   );
 
   @Serdeable
