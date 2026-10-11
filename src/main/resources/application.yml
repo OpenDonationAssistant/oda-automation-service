@@ -17,6 +17,9 @@ micronaut:
         enabled: true
         step: PT1M
   http.services.widgets.url: http://widgets-service
+  serde:
+    serialization:
+      inclusion: ALWAYS
 flyway:
   datasources:
     default:
