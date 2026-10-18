@@ -14,6 +14,9 @@ public class TriggerFactory {
       case "donationgoal-filled" -> new FilledDonationGoalTrigger(
         new AutomationTriggerData(id, value)
       );
+      case "donation" -> new DonationTrigger(
+        new AutomationTriggerData(id, value)
+      );
       default -> new NeverTrigger(new AutomationTriggerData(id, value));
     };
   }
@@ -24,6 +27,7 @@ public class TriggerFactory {
       case "stream-started" -> new StreamStartedTrigger(data);
       case "channel-raided" -> new ChannelRaidedTrigger(data);
       case "command" -> new CommandTrigger(data);
+      case "donation" -> new DonationTrigger(data);
       default -> new NeverTrigger(data);
     };
   }

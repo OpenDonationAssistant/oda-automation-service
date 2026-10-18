@@ -4,6 +4,7 @@ import io.github.opendonationassistant.automation.domain.IterationFactory;
 import io.github.opendonationassistant.automation.listener.messagehandlers.twitch.TwitchChannelRaidEventHandler.TwitchChannelRaidEvent;
 import io.github.opendonationassistant.commons.logging.ODALogger;
 import io.github.opendonationassistant.events.HasRecipientId;
+import io.github.opendonationassistant.events.history.event.HistoryItemEvent;
 import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
 import io.github.opendonationassistant.rabbit.Exchange;
 import io.micronaut.messaging.annotation.MessageHeader;
@@ -24,7 +25,8 @@ public class ProcessingListener {
   public static final io.github.opendonationassistant.rabbit.Queue QUEUE =
     new io.github.opendonationassistant.rabbit.Queue(QUEUE_NAME);
   public static final List<Exchange> BINDING = List.of(
-    Exchange.Exchange("twitch", Map.of("event.*", QUEUE))
+    Exchange.Exchange("twitch", Map.of("event.*", QUEUE)),
+    Exchange.Exchange("history", Map.of("event.HistoryItemEvent", QUEUE))
   );
 
   private ODALogger log = new ODALogger(this);
@@ -84,6 +86,10 @@ public class ProcessingListener {
       case "TwitchChannelRaidEvent":
         return Optional.ofNullable(
           mapper.readValue(message, TwitchChannelRaidEvent.class)
+        );
+      case "HistoryItemEvent":
+        return Optional.ofNullable(
+          mapper.readValue(message, HistoryItemEvent.class)
         );
     }
     log.debug("Can't convert step", Map.of("type", type));

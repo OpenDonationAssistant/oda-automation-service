@@ -56,6 +56,10 @@ public class ActionFactory {
         rabbit
       );
       case SendKickMessageAction.ID -> new SendKickMessageAction(data, rabbit);
+      case SendWebhookMessageAction.ID -> new SendWebhookMessageAction(
+        data,
+        rabbit
+      );
       case SendVKLiveMessageAction.ID -> new SendVKLiveMessageAction(
         data,
         rabbit
