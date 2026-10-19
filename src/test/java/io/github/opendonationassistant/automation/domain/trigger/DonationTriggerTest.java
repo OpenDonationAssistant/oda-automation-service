@@ -77,6 +77,154 @@ public class DonationTriggerTest {
   }
 
   @Test
+  public void testNotTriggeredForNonPaymentHistoryItemEvent() {
+    // Arrange
+    var trigger = trigger();
+    var event = new HistoryItemEvent(
+      "id",
+      "media",
+      "recipient-1",
+      "ODA",
+      "origin",
+      Instant.EPOCH,
+      "nickname",
+      new Amount(100, 0, "RUB"),
+      "hello",
+      List.of(),
+      List.of(),
+      null
+    );
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertFalse(triggered);
+  }
+
+  @Test
+  public void testTriggeredWhenConfiguredSystemMatches() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData("donation", Map.of("system", "ODA"))
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertTrue(triggered);
+  }
+
+  @Test
+  public void testNotTriggeredWhenConfiguredSystemDoesNotMatch() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData("donation", Map.of("system", "Twitch"))
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertFalse(triggered);
+  }
+
+  @Test
+  public void testTriggeredWhenAmountWithinConfiguredRange() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData(
+        "donation",
+        Map.of("minAmount", 50, "maxAmount", 150)
+      )
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertTrue(triggered);
+  }
+
+  @Test
+  public void testTriggeredOnInclusiveRangeBoundaries() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData(
+        "donation",
+        Map.of("minAmount", 100, "maxAmount", 100)
+      )
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertTrue(triggered);
+  }
+
+  @Test
+  public void testNotTriggeredWhenAmountBelowMin() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData("donation", Map.of("minAmount", 150))
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertFalse(triggered);
+  }
+
+  @Test
+  public void testNotTriggeredWhenAmountAboveMax() {
+    // Arrange
+    var trigger = new DonationTrigger(
+      new AutomationTriggerData("donation", Map.of("maxAmount", 50))
+    );
+    var event = donation("nickname", new Amount(100, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertFalse(triggered);
+  }
+
+  @Test
+  public void testTriggeredByDefaultZeroToInfinityRange() {
+    // Arrange
+    var trigger = trigger();
+    var event = donation("nickname", new Amount(1, 0, "RUB"), "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertTrue(triggered);
+  }
+
+  @Test
+  public void testNotTriggeredWhenAmountMissing() {
+    // Arrange
+    var trigger = trigger();
+    var event = donation("nickname", null, "hello");
+
+    // Act
+    var triggered = trigger.isTriggered(event);
+
+    // Assert
+    assertFalse(triggered);
+  }
+
+  @Test
   public void testExtractsNicknameAmountAndMessageVariables() {
     // Arrange
     var trigger = trigger();
