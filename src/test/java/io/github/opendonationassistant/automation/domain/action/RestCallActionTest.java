@@ -108,6 +108,25 @@ public class RestCallActionTest {
   }
 
   @Test
+  public void testSkipsWhenOnServerIsNotDefined() {
+    var action = new RestCallAction(
+      new AutomationActionData(
+        RestCallAction.ID,
+        Map.of("url", "https://example.com/hooks", "onServer", false)
+      ),
+      httpClient
+    );
+
+    when(
+      blockingClient.exchange(any(HttpRequest.class), eq(String.class))
+    ).thenReturn(HttpResponse.ok("{}"));
+
+    action.execute(iterationWith("streamer", "secret"));
+
+    verifyNoInteractions(httpClient);
+  }
+
+  @Test
   public void testSkipsWhenUrlIsMissing() {
     var action = new RestCallAction(
       new AutomationActionData(RestCallAction.ID, Map.of("method", "POST", "onServer", true)),
