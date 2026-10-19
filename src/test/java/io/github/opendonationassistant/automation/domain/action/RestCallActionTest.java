@@ -58,7 +58,8 @@ public class RestCallActionTest {
           "payload",
           "{\"user\":\"<nickname>\",\"token\":\"<token>\"}",
           "headers",
-          Map.of("Authorization", "Bearer <token>", "X-Static", "static-value")
+          Map.of("Authorization", "Bearer <token>", "X-Static", "static-value"),
+          "onServer", true
         )
       ),
       httpClient
@@ -90,7 +91,7 @@ public class RestCallActionTest {
     var action = new RestCallAction(
       new AutomationActionData(
         RestCallAction.ID,
-        Map.of("url", "https://example.com/hooks")
+        Map.of("url", "https://example.com/hooks", "onServer", true)
       ),
       httpClient
     );
@@ -109,7 +110,7 @@ public class RestCallActionTest {
   @Test
   public void testSkipsWhenUrlIsMissing() {
     var action = new RestCallAction(
-      new AutomationActionData(RestCallAction.ID, Map.of("method", "POST")),
+      new AutomationActionData(RestCallAction.ID, Map.of("method", "POST", "onServer", true)),
       httpClient
     );
 
@@ -123,7 +124,7 @@ public class RestCallActionTest {
     var action = new RestCallAction(
       new AutomationActionData(
         RestCallAction.ID,
-        Map.of("url", "ftp://example.com/hooks")
+        Map.of("url", "ftp://example.com/hooks", "onServer", true)
       ),
       httpClient
     );
@@ -138,7 +139,7 @@ public class RestCallActionTest {
     var action = new RestCallAction(
       new AutomationActionData(
         RestCallAction.ID,
-        Map.of("url", "https://example.com/hooks", "method", "TRACE")
+        Map.of("url", "https://example.com/hooks", "method", "TRACE", "onServer", true)
       ),
       httpClient
     );
@@ -165,21 +166,11 @@ public class RestCallActionTest {
   }
 
   @Test
-  public void testRunsOnServerByDefault() {
-    var action = new RestCallAction(
-      new AutomationActionData(RestCallAction.ID, Map.of()),
-      httpClient
-    );
-
-    assertTrue(action.isOnServer());
-  }
-
-  @Test
   public void testSwallowsHttpErrors() {
     var action = new RestCallAction(
       new AutomationActionData(
         RestCallAction.ID,
-        Map.of("url", "https://example.com/hooks", "method", "POST")
+        Map.of("url", "https://example.com/hooks", "method", "POST", "onServer", true)
       ),
       httpClient
     );
