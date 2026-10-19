@@ -2,6 +2,7 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -145,6 +146,32 @@ public class RestCallActionTest {
     action.execute(iterationWith("streamer", "secret"));
 
     verifyNoInteractions(httpClient);
+  }
+
+  @Test
+  public void testSkipsWhenOnServerIsFalse() {
+    var action = new RestCallAction(
+      new AutomationActionData(
+        RestCallAction.ID,
+        Map.of("url", "https://example.com/hooks", "onServer", false)
+      ),
+      httpClient
+    );
+
+    assertFalse(action.isOnServer());
+    action.execute(iterationWith("streamer", "secret"));
+
+    verifyNoInteractions(httpClient);
+  }
+
+  @Test
+  public void testRunsOnServerByDefault() {
+    var action = new RestCallAction(
+      new AutomationActionData(RestCallAction.ID, Map.of()),
+      httpClient
+    );
+
+    assertTrue(action.isOnServer());
   }
 
   @Test

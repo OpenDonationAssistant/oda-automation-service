@@ -33,6 +33,12 @@ public class RestCallAction extends AutomationAction {
 
   @Override
   public void execute(Iteration iteration) {
+    if (!isOnServer()) {
+      log.debug("Skipping RestCallAction: configured to run on client", () ->
+        Map.of("recipientId", iteration.recipientId())
+      );
+      return;
+    }
     var url = resolvedUrl(iteration);
     var method = HttpMethod.parse(method());
     if (
@@ -94,6 +100,10 @@ public class RestCallAction extends AutomationAction {
     return Optional.ofNullable((String) data().value().get("url"))
       .map(template -> VariableResolver.resolve(template, iteration).trim())
       .filter(RestCallAction::isSupportedUrl);
+  }
+
+  public boolean isOnServer() {
+    return Boolean.TRUE.equals(data().value().get("onServer"));
   }
 
   public String method() {
