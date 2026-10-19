@@ -69,12 +69,16 @@ public class DonationTrigger extends AutomationTrigger {
     }
     Amount amount = event.amount();
     if (amount != null) {
+      iteration.add(
+        new EphemeralVariable<String>(
+          "amount",
+          String.valueOf(amount.getMajor())
+        )
+      );
       String currency = amount.getCurrency();
-      String renderedAmount =
-        currency != null && !currency.isBlank()
-          ? amount.getMajor() + " " + currency
-          : String.valueOf(amount.getMajor());
-      iteration.add(new EphemeralVariable<String>("amount", renderedAmount));
+      if (currency != null && !currency.isBlank()) {
+        iteration.add(new EphemeralVariable<String>("currency", currency));
+      }
     }
     String message = event.message();
     if (message != null) {

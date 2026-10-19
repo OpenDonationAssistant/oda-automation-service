@@ -236,7 +236,8 @@ public class DonationTriggerTest {
 
     // Assert
     assertEquals("nickname", iteration.variable("nickname").get().value());
-    assertEquals("100 RUB", iteration.variable("amount").get().value());
+    assertEquals("100", iteration.variable("amount").get().value());
+    assertEquals("RUB", iteration.variable("currency").get().value());
     assertEquals("hello", iteration.variable("message").get().value());
   }
 
@@ -253,11 +254,12 @@ public class DonationTriggerTest {
     // Assert
     assertTrue(iteration.variable("nickname").isEmpty());
     assertTrue(iteration.variable("amount").isEmpty());
+    assertTrue(iteration.variable("currency").isEmpty());
     assertTrue(iteration.variable("message").isEmpty());
   }
 
   @Test
-  public void testRendersAmountWithoutCurrencyWhenCurrencyIsBlank() {
+  public void testSkipsCurrencyWhenCurrencyIsBlank() {
     // Arrange
     var trigger = trigger();
     var event = donation("nickname", new Amount(50, 0, ""), "hello");
@@ -268,6 +270,7 @@ public class DonationTriggerTest {
 
     // Assert
     assertEquals("50", iteration.variable("amount").get().value());
+    assertTrue(iteration.variable("currency").isEmpty());
   }
 
   @Test
@@ -282,6 +285,7 @@ public class DonationTriggerTest {
     // Assert
     assertTrue(iteration.variable("nickname").isEmpty());
     assertTrue(iteration.variable("amount").isEmpty());
+    assertTrue(iteration.variable("currency").isEmpty());
     assertTrue(iteration.variable("message").isEmpty());
   }
 }
