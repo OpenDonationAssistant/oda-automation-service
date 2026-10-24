@@ -1,7 +1,6 @@
 package io.github.opendonationassistant.automation.domain.action;
 
 import io.github.opendonationassistant.automation.AutomationAction;
-import io.github.opendonationassistant.automation.IVariable;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.commons.logging.ODALogger;
@@ -27,9 +26,9 @@ public class TwitchShoutoutAction extends AutomationAction {
 
   @Override
   public void execute(Iteration iteration) {
-    final Optional<IVariable<?>> fromTwitchId = iteration.variable(
-      "fromChannelId"
-    );
+    final Optional<String> fromTwitchId = iteration
+      .resolveVariable("fromChannelId", data().value())
+      .map(String::valueOf);
     log.info(
       "Executing TwitchShoutoutAction",
       Map.of(
@@ -43,10 +42,7 @@ public class TwitchShoutoutAction extends AutomationAction {
       return;
     }
     rabbitClient.sendCommand(
-      new TwitchShoutoutCommand(
-        iteration.recipientId(),
-        (String) fromTwitchId.get().value()
-      )
+      new TwitchShoutoutCommand(iteration.recipientId(), fromTwitchId.get())
     );
   }
 

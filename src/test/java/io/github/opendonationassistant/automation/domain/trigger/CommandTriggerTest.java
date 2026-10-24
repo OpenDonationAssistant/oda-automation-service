@@ -16,6 +16,7 @@ import io.github.opendonationassistant.automation.repository.AutomationRuleData;
 import io.github.opendonationassistant.automation.repository.AutomationRuleDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
+import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.http.client.HttpClient;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -34,9 +35,10 @@ public class CommandTriggerTest {
   );
   RabbitClient rabbit = Mockito.mock(RabbitClient.class);
   HttpClient httpClient = Mockito.mock(HttpClient.class);
+  UIFacade uiFacade = Mockito.mock(UIFacade.class);
   TriggerFactory triggers = Mockito.spy(new TriggerFactory());
   ActionFactory actions = Mockito.spy(
-    new ActionFactory(variables, rabbit, httpClient)
+    new ActionFactory(variables, rabbit, httpClient, uiFacade)
   );
   AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
 

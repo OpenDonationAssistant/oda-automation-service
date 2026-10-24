@@ -4,6 +4,7 @@ import io.github.opendonationassistant.automation.AutomationAction;
 import io.github.opendonationassistant.automation.AutomationAction.EmptyAutomationAction;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
+import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.http.client.HttpClient;
 import jakarta.inject.Inject;
@@ -16,16 +17,19 @@ public class ActionFactory {
   private final AutomationVariableRepository variables;
   private final RabbitClient rabbit;
   private final HttpClient httpClient;
+  private final UIFacade uiFacade;
 
   @Inject
   public ActionFactory(
     AutomationVariableRepository variables,
     @Named("commands") RabbitClient rabbit,
-    HttpClient httpClient
+    HttpClient httpClient,
+    UIFacade uiFacade
   ) {
     this.variables = variables;
     this.rabbit = rabbit;
     this.httpClient = httpClient;
+    this.uiFacade = uiFacade;
   }
 
   public AutomationAction from(String recipientId, AutomationActionData data) {
@@ -72,6 +76,7 @@ public class ActionFactory {
       case TwitchShoutoutAction.ID -> new TwitchShoutoutAction(data, rabbit);
       case TwitchAnnounceAction.ID -> new TwitchAnnounceAction(data, rabbit);
       case RestCallAction.ID -> new RestCallAction(data, httpClient);
+      case RunAlertAction.ID -> new RunAlertAction(data, uiFacade);
       default -> new EmptyAutomationAction(data);
     };
   }

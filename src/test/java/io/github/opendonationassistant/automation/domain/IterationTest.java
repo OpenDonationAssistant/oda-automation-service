@@ -1,8 +1,11 @@
 package io.github.opendonationassistant.automation.domain;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 import io.github.opendonationassistant.automation.AutomationRule;
+import io.github.opendonationassistant.automation.EphemeralVariable;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.action.PinTwitchMessageAction.SendAndPinChatMessageCommand;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
@@ -13,11 +16,13 @@ import io.github.opendonationassistant.automation.repository.AutomationRuleDataR
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import io.github.opendonationassistant.events.twitch.events.TwitchStreamStartedEvent;
+import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.http.client.HttpClient;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,9 +37,10 @@ public class IterationTest {
   );
   RabbitClient rabbit = Mockito.mock(RabbitClient.class);
   HttpClient httpClient = Mockito.mock(HttpClient.class);
+  UIFacade uiFacade = Mockito.mock(UIFacade.class);
   TriggerFactory triggers = Mockito.spy(new TriggerFactory());
   ActionFactory actions = Mockito.spy(
-    new ActionFactory(variables, rabbit, httpClient)
+    new ActionFactory(variables, rabbit, httpClient, uiFacade)
   );
   AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
 
@@ -155,5 +161,66 @@ public class IterationTest {
       metrics
     ).run();
     Mockito.verifyNoInteractions(rabbit);
+  }
+
+  @Test
+  public void testResolveVariableUseIterationVariableWhenNotOverridden() {
+    var iteration = new Iteration(
+      "recipient",
+      new Object(),
+      List.of(),
+      List.of(),
+      metrics
+    );
+    iteration.add(new EphemeralVariable<>("nickname", "trigger nickname"));
+
+    assertEquals(
+      Optional.of("trigger nickname"),
+      iteration.resolveVariable(
+        "nickname",
+        Map.of()
+      )
+    );
+    assertEquals(
+      Optional.of("trigger nickname"),
+      iteration.resolveVariable("nickname", Map.of())
+    );
+  }
+
+  @Test
+  public void testResolveVariablePrefersOverrides() {
+    var iteration = new Iteration(
+      "recipient",
+      new Object(),
+      List.of(),
+      List.of(),
+      metrics
+    );
+    iteration.add(new EphemeralVariable<>("nickname", "trigger nickname"));
+
+    assertEquals(
+      Optional.of("configured nickname"),
+      iteration.resolveVariable(
+        "nickname",
+        Map.of("nickname", "configured nickname")
+      )
+    );
+    assertEquals(
+      Optional.of("trigger nickname"),
+      iteration.resolveVariable("nickname", Map.of())
+    );
+  }
+
+  @Test
+  public void testResolveVariableReturnsEmptyWhenMissing() {
+    var iteration = new Iteration(
+      "recipient",
+      new Object(),
+      List.of(),
+      List.of(),
+      metrics
+    );
+
+    assertTrue(iteration.resolveVariable("nickname", Map.of()).isEmpty());
   }
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -53,6 +54,23 @@ public class Iteration {
       .stream()
       .filter(variable -> variable.name().equals(name))
       .findAny();
+  }
+
+  /**
+   * Resolves a variable value, preferring the provided overrides (for example
+   * values configured on an action) over the variables extracted by triggers.
+   */
+  public Optional<Object> resolveVariable(
+    String name,
+    Map<String, ?> overrides
+  ) {
+    var configured = overrides.get(name);
+    if (configured != null) {
+      return Optional.of(configured);
+    }
+    return variable(name)
+      .map(resolved -> (Object) resolved.value())
+      .filter(Objects::nonNull);
   }
 
   public void run() {
