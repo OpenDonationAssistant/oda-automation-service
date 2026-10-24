@@ -62,26 +62,6 @@ public class AutomationVariableRepository {
     return repository.getByRecipientIdAndId(recipientId, id).map(this::convert);
   }
 
-  public AutomationVariable<?> update(
-    String recipientId,
-    String type,
-    String variableId,
-    String variableName,
-    String variableValue
-  ) {
-    var data = new AutomationVariableData(
-      variableId,
-      type,
-      Optional.ofNullable(variableName).orElse("<Без названия>"),
-      recipientId,
-      Optional.ofNullable(variableValue).orElse("")
-    );
-    repository.update(data);
-    final AutomationVariable<?> created = convert(data);
-    log.debug("Updated variable", Map.of("variable", created));
-    return created;
-  }
-
   public AutomationVariable<? extends Object> create(
     String recipientId,
     String type,

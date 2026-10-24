@@ -50,12 +50,18 @@ public class AutomationVariable<T> implements IVariable<T> {
   }
 
   public void save() {
-    log.debug("Updating variable", Map.of("updated", data));
-    repository.update(data);
+    repository
+      .getByRecipientIdAndId(data.recipientId(), data.id())
+      .ifPresent(existing -> {
+        log.debug("Updating variable", Map.of("updated", data));
+        repository.update(data);
+      });
   }
 
   public void delete() {
-    repository.deleteById(this.data.id());
+    repository
+      .getByRecipientIdAndId(data.recipientId(), data.id())
+      .ifPresent(existing -> repository.deleteById(existing.id()));
   }
 
   public static enum Scope {

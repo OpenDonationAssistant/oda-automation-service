@@ -48,11 +48,15 @@ public class AutomationRule {
   }
 
   public void save() {
-    repository.update(data);
+    repository
+      .getByRecipientIdAndId(data.recipientId(), data.id())
+      .ifPresent(existing -> repository.update(data));
   }
 
   public void delete() {
-    repository.deleteById(this.data.id());
+    repository
+      .getByRecipientIdAndId(data.recipientId(), data.id())
+      .ifPresent(existing -> repository.deleteById(existing.id()));
   }
 
   public List<AutomationTrigger> getTriggers() {

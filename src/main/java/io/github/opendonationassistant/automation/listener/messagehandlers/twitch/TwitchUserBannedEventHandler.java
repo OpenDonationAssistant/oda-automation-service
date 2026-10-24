@@ -8,9 +8,12 @@ import io.github.opendonationassistant.events.ui.UIFacade;
 import io.github.opendonationassistant.events.ui.UIFacade.Event;
 import io.github.opendonationassistant.events.ui.UIFacade.Variable;
 import io.micronaut.serde.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
 
+@Singleton
 public class TwitchUserBannedEventHandler
   extends AbstractMessageHandler<TwitchUserBannedEvent> {
 
@@ -18,6 +21,7 @@ public class TwitchUserBannedEventHandler
   private final TimeBasedEpochGenerator uuid =
     Generators.timeBasedEpochGenerator();
 
+  @Inject
   public TwitchUserBannedEventHandler(UIFacade ui, ObjectMapper mapper) {
     super(mapper);
     this.ui = ui;
