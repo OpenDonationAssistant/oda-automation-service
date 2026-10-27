@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.opendonationassistant.automation.EphemeralVariable;
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
@@ -26,6 +27,7 @@ public class RunAlertActionTest {
   private final AutomationMetrics metrics = new AutomationMetrics(
     new SimpleMeterRegistry()
   );
+  private final RateLimiter rateLimiter = new RateLimiter();
 
   @Test
   public void testSendsAlertEventWithConfiguredAlertAndTriggerVariables() {
@@ -140,7 +142,8 @@ public class RunAlertActionTest {
       new Object(),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     iteration.add(new EphemeralVariable<>("nickname", nickname));
     iteration.add(new EphemeralVariable<>("amount", amount));

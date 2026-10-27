@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.EphemeralVariable;
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
 import io.github.opendonationassistant.automation.domain.action.PinTwitchMessageAction.SendAndPinChatMessageCommand;
 import io.github.opendonationassistant.automation.domain.trigger.TriggerFactory;
@@ -43,6 +44,7 @@ public class IterationTest {
     new ActionFactory(variables, rabbit, httpClient, uiFacade)
   );
   AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
+  RateLimiter rateLimiter = new RateLimiter();
 
   @Test
   public void testRunningActionIfTriggerFired() {
@@ -75,7 +77,8 @@ public class IterationTest {
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
       List.of(rule),
-      metrics
+      metrics,
+      rateLimiter
     ).run();
     verify(rabbit).sendCommand(
       new SendAndPinChatMessageCommand(
@@ -115,7 +118,8 @@ public class IterationTest {
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
       List.of(rule),
-      metrics
+      metrics,
+      rateLimiter
     ).run();
 
     Mockito.verifyNoInteractions(rabbit);
@@ -158,7 +162,8 @@ public class IterationTest {
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
       List.of(rule),
-      metrics
+      metrics,
+      rateLimiter
     ).run();
     Mockito.verifyNoInteractions(rabbit);
   }
@@ -170,7 +175,8 @@ public class IterationTest {
       new Object(),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     iteration.add(new EphemeralVariable<>("nickname", "trigger nickname"));
 
@@ -194,7 +200,8 @@ public class IterationTest {
       new Object(),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     iteration.add(new EphemeralVariable<>("nickname", "trigger nickname"));
 
@@ -218,7 +225,8 @@ public class IterationTest {
       new Object(),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
 
     assertTrue(iteration.resolveVariable("nickname", Map.of()).isEmpty());

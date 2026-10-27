@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.github.opendonationassistant.automation.EphemeralVariable;
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.domain.action.SendWebhookMessageAction.SendDiscordWebhookMessageCommand;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
@@ -36,6 +37,7 @@ public class SendWebhookMessageActionTest {
   private final AutomationMetrics metrics = new AutomationMetrics(
     new SimpleMeterRegistry()
   );
+  private final RateLimiter rateLimiter = new RateLimiter();
 
   /**
    * Positive case: every {@code <placeholder>} in the template is replaced with
@@ -154,7 +156,8 @@ public class SendWebhookMessageActionTest {
       new Object(),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     for (var variable : variables) {
       iteration.add(variable);

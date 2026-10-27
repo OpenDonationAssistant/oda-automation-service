@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 import io.github.opendonationassistant.automation.AutomationRule;
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.api.TriggerRuleApi.TriggerRuleCommand;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.domain.action.ActionFactory;
@@ -41,6 +42,7 @@ public class CommandTriggerTest {
     new ActionFactory(variables, rabbit, httpClient, uiFacade)
   );
   AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
+  RateLimiter rateLimiter = new RateLimiter();
 
   @Test
   public void testTriggeredByCommandWithMatchingRuleId() {
@@ -125,7 +127,8 @@ public class CommandTriggerTest {
       ),
       List.of(),
       List.of(rule),
-      metrics
+      metrics,
+      rateLimiter
     ).run();
     verify(rabbit).sendCommand(
       new SendAndPinChatMessageCommand(
@@ -171,7 +174,8 @@ public class CommandTriggerTest {
       new TriggerRuleCommand("other-rule-id", "nickname", "system", Map.of()),
       List.of(),
       List.of(rule),
-      metrics
+      metrics,
+      rateLimiter
     ).run();
     Mockito.verifyNoInteractions(rabbit);
   }
@@ -186,7 +190,8 @@ public class CommandTriggerTest {
       new TriggerRuleCommand("rule-id", "nickname", "system", Map.of("var1", "val1")),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     trigger.extractVariables(
       new TriggerRuleCommand("rule-id", "nickname", "system", Map.of("var1", "val1")),
@@ -207,7 +212,8 @@ public class CommandTriggerTest {
       new TriggerRuleCommand("rule-id", null, null, null),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
     trigger.extractVariables(
       new TriggerRuleCommand("rule-id", null, null, null),

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.automation.repository.AutomationTriggerData;
@@ -21,13 +22,14 @@ public class DonationTriggerTest {
   private final AutomationMetrics metrics = new AutomationMetrics(
     new SimpleMeterRegistry()
   );
+  private final RateLimiter rateLimiter = new RateLimiter();
 
   private DonationTrigger trigger() {
     return new DonationTrigger(new AutomationTriggerData("donation", Map.of()));
   }
 
   private Iteration iteration(Object source) {
-    return new Iteration("recipient", source, List.of(), List.of(), metrics);
+    return new Iteration("recipient", source, List.of(), List.of(), metrics, rateLimiter);
   }
 
   private HistoryItemEvent donation(

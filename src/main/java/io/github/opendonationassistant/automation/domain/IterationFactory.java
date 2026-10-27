@@ -1,5 +1,6 @@
 package io.github.opendonationassistant.automation.domain;
 
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.automation.repository.AutomationRuleRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
@@ -17,16 +18,19 @@ public class IterationFactory {
   private final AutomationRuleRepository ruleRepository;
   private final AutomationVariableRepository variableRepository;
   private final AutomationMetrics metrics;
+  private final RateLimiter rateLimiter;
 
   @Inject
   public IterationFactory(
     AutomationRuleRepository ruleRepository,
     AutomationVariableRepository variableRepository,
-    AutomationMetrics metrics
+    AutomationMetrics metrics,
+    RateLimiter rateLimiter
   ) {
     this.ruleRepository = ruleRepository;
     this.variableRepository = variableRepository;
     this.metrics = metrics;
+    this.rateLimiter = rateLimiter;
   }
 
   public Iteration create(String recipientId, Object source) {
@@ -40,7 +44,8 @@ public class IterationFactory {
       source,
       variables,
       rules,
-      metrics
+      metrics,
+      rateLimiter
     );
     final Supplier<Map<String, ?>> logSupplier = () -> {
       var output = new HashMap<String, Object>();

@@ -3,8 +3,10 @@ package io.github.opendonationassistant.automation.domain;
 import io.github.opendonationassistant.automation.AutomationRule;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.IVariable;
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
 import io.github.opendonationassistant.commons.logging.ODALogger;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +23,15 @@ public class Iteration {
   private final List<IVariable<?>> variables;
   private final List<AutomationRule> rules;
   private final AutomationMetrics metrics;
+  private final RateLimiter rateLimiter;
 
   public Iteration(
     String recipientId,
     Object source,
     List<AutomationVariable<?>> variables,
     List<AutomationRule> rules,
-    AutomationMetrics metrics
+    AutomationMetrics metrics,
+    RateLimiter rateLimiter
   ) {
     this.recipientId = recipientId;
     this.source = source;
@@ -35,6 +39,7 @@ public class Iteration {
     this.variables.addAll(variables);
     this.rules = rules;
     this.metrics = metrics;
+    this.rateLimiter = rateLimiter;
   }
 
   public String recipientId() {
@@ -59,9 +64,10 @@ public class Iteration {
   public Optional<IVariable<?>> variableById(String id) {
     return variables
       .stream()
-      .filter(variable ->
-        variable instanceof AutomationVariable<?> persistent &&
-        persistent.data().id().equals(id)
+      .filter(
+        variable ->
+          variable instanceof AutomationVariable<?> persistent &&
+          persistent.data().id().equals(id)
       )
       .findAny();
   }
@@ -112,6 +118,13 @@ public class Iteration {
         .findAny()
         .ifPresent(trigger -> {
           log.debug("Trigger found", Map.of("id", trigger.data().id()));
+          if (!rateLimiter.isAllowed(recipientId, Instant.now())) {
+            log.warn(
+              "Iteration rate limited",
+              Map.of("recipientId", recipientId)
+            );
+            return;
+          }
           trigger.extractVariables(source, this);
           rule.getActions().forEach(action -> action.execute(this));
         })

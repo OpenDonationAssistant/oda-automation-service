@@ -2,6 +2,7 @@ package io.github.opendonationassistant.automation.domain.action;
 
 import static org.mockito.Mockito.verify;
 
+import io.github.opendonationassistant.automation.RateLimiter;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.domain.action.TwitchAnnounceAction.TwitchAnnounceCommand;
 import io.github.opendonationassistant.automation.metrics.AutomationMetrics;
@@ -18,6 +19,7 @@ public class TwitchAnnounceActionTest {
 
   RabbitClient rabbit = Mockito.mock(RabbitClient.class);
   AutomationMetrics metrics = new AutomationMetrics(new SimpleMeterRegistry());
+  RateLimiter rateLimiter = new RateLimiter();
 
   @Test
   public void testSendsAnnouncementCommandWhenExecuted() {
@@ -42,7 +44,8 @@ public class TwitchAnnounceActionTest {
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
 
     action.execute(iteration);
@@ -71,7 +74,8 @@ public class TwitchAnnounceActionTest {
       new TwitchStreamStartedEvent("eventId", "testuser", "url"),
       List.of(),
       List.of(),
-      metrics
+      metrics,
+      rateLimiter
     );
 
     action.execute(iteration);

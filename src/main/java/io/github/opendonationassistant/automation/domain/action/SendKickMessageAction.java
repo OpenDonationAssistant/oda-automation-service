@@ -26,12 +26,12 @@ public class SendKickMessageAction extends AutomationAction {
   @Override
   public void execute(Iteration iteration) {
     final String recipientId = iteration.recipientId();
-    final var senderRefreshTokenId = value("senderRefreshTokenId");
+    final var refreshTokenId = value("refreshTokenId");
     final var recipientKickId = value("recipientKickId");
     final var message = value("message");
     if (
       recipientId == null ||
-      senderRefreshTokenId.isEmpty() ||
+      refreshTokenId.isEmpty() ||
       recipientKickId.isEmpty() ||
       message.isEmpty()
     ) {
@@ -42,8 +42,8 @@ public class SendKickMessageAction extends AutomationAction {
       Map.of(
         "recipientId",
         recipientId,
-        "senderRefreshTokenId",
-        senderRefreshTokenId.get(),
+        "refreshTokenId",
+        refreshTokenId.get(),
         "recipientKickId",
         recipientKickId.get()
       )
@@ -51,7 +51,7 @@ public class SendKickMessageAction extends AutomationAction {
     rabbit.sendCommand(
       new SendKickMessageCommand(
         recipientId,
-        senderRefreshTokenId.get(),
+        refreshTokenId.get(),
         recipientKickId.get(),
         message.get()
       )
@@ -61,7 +61,7 @@ public class SendKickMessageAction extends AutomationAction {
   @Serdeable
   public static record SendKickMessageCommand(
     String recipientId,
-    String senderRefreshTokenId,
+    String refreshTokenId,
     String recipientKickId,
     String message
   ) {}
