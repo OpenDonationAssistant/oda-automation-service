@@ -13,6 +13,7 @@ import io.github.opendonationassistant.automation.repository.AutomationActionDat
 import io.github.opendonationassistant.automation.repository.AutomationVariableData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class DecreaseVariableActionTest {
     AutomationVariableDataRepository.class
   );
   private final Iteration iteration = mock(Iteration.class);
+  private final RabbitClient rabbit = mock(RabbitClient.class);
 
   private AutomationNumberVariable numberVariable(String value) {
     return new AutomationNumberVariable(
@@ -40,7 +42,8 @@ public class DecreaseVariableActionTest {
         RECIPIENT_ID,
         value
       ),
-      dataRepository
+      dataRepository,
+      rabbit
     );
   }
 
@@ -97,7 +100,8 @@ public class DecreaseVariableActionTest {
         RECIPIENT_ID,
         "hello"
       ),
-      dataRepository
+      dataRepository,
+      rabbit
     );
     when(variables.getById(RECIPIENT_ID, VARIABLE_ID)).thenReturn(
       Optional.of(variable)

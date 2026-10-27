@@ -3,15 +3,17 @@ package io.github.opendonationassistant.automation.domain.variable;
 import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.repository.AutomationVariableData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableDataRepository;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import java.math.BigDecimal;
 
 public class AutomationNumberVariable extends AutomationVariable<BigDecimal> {
 
   public AutomationNumberVariable(
     AutomationVariableData data,
-    AutomationVariableDataRepository repository
+    AutomationVariableDataRepository repository,
+    RabbitClient rabbit
   ) {
-    super(data, repository);
+    super(data, repository, rabbit);
   }
 
   public BigDecimal value() {

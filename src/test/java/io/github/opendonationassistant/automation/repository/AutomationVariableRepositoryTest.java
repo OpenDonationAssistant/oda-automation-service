@@ -6,8 +6,11 @@ import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.commons.logging.ODALogger;
+import io.github.opendonationassistant.rabbit.RabbitClient;
+import io.micronaut.test.annotation.MockBean;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +18,7 @@ import org.instancio.junit.Given;
 import org.instancio.junit.InstancioExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 @MicronautTest(environments = "allinone")
 @ExtendWith(InstancioExtension.class)
@@ -24,6 +28,12 @@ public class AutomationVariableRepositoryTest {
 
   @Inject
   AutomationVariableRepository repository;
+
+  @MockBean(value = RabbitClient.class, named = "automation")
+  @Named("automation")
+  RabbitClient automationRabbitClient() {
+    return Mockito.mock(RabbitClient.class);
+  }
 
   @Test
   public void testCreatingAutomationVariable(@Given String recipientId) {

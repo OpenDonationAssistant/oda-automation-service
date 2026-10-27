@@ -17,6 +17,9 @@ public class TriggerFactory {
       case "donation" -> new DonationTrigger(
         new AutomationTriggerData(id, value)
       );
+      case "variable-equals-value" -> new VariableEqualsValueTrigger(
+        new AutomationTriggerData(id, value)
+      );
       default -> new NeverTrigger(new AutomationTriggerData(id, value));
     };
   }
@@ -28,6 +31,7 @@ public class TriggerFactory {
       case "channel-raided" -> new ChannelRaidedTrigger(data);
       case "command" -> new CommandTrigger(data);
       case "donation" -> new DonationTrigger(data);
+      case "variable-equals-value" -> new VariableEqualsValueTrigger(data);
       default -> new NeverTrigger(data);
     };
   }

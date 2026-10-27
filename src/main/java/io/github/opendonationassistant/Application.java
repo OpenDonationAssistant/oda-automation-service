@@ -78,4 +78,10 @@ public class Application {
   public RabbitClient commandsFacade(ChannelPool pool, ObjectMapper mapper) {
     return new RabbitClient(pool, mapper, "commands");
   }
+
+  @Singleton
+  @Named("automation")
+  public RabbitClient automationFacade(ChannelPool pool, ObjectMapper mapper) {
+    return new RabbitClient(pool, mapper, "automation");
+  }
 }

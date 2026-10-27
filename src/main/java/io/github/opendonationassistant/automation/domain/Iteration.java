@@ -49,10 +49,20 @@ public class Iteration {
     this.variables.add(variable);
   }
 
-  public Optional<IVariable<?>> variable(String name) {
+  public Optional<IVariable<?>> variableByName(String name) {
     return variables
       .stream()
       .filter(variable -> variable.name().equals(name))
+      .findAny();
+  }
+
+  public Optional<IVariable<?>> variableById(String id) {
+    return variables
+      .stream()
+      .filter(variable ->
+        variable instanceof AutomationVariable<?> persistent &&
+        persistent.data().id().equals(id)
+      )
       .findAny();
   }
 
@@ -68,7 +78,7 @@ public class Iteration {
     if (configured != null) {
       return Optional.of(configured);
     }
-    return variable(name)
+    return variableByName(name)
       .map(resolved -> (Object) resolved.value())
       .filter(Objects::nonNull);
   }

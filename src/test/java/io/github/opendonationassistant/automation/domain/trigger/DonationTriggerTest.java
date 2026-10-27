@@ -235,10 +235,10 @@ public class DonationTriggerTest {
     trigger.extractVariables(event, iteration);
 
     // Assert
-    assertEquals("nickname", iteration.variable("nickname").get().value());
-    assertEquals("100", iteration.variable("amount").get().value());
-    assertEquals("RUB", iteration.variable("currency").get().value());
-    assertEquals("hello", iteration.variable("message").get().value());
+    assertEquals("nickname", iteration.variableByName("nickname").get().value());
+    assertEquals("100", iteration.variableByName("amount").get().value());
+    assertEquals("RUB", iteration.variableByName("currency").get().value());
+    assertEquals("hello", iteration.variableByName("message").get().value());
   }
 
   @Test
@@ -252,10 +252,10 @@ public class DonationTriggerTest {
     trigger.extractVariables(event, iteration);
 
     // Assert
-    assertTrue(iteration.variable("nickname").isEmpty());
-    assertTrue(iteration.variable("amount").isEmpty());
-    assertTrue(iteration.variable("currency").isEmpty());
-    assertTrue(iteration.variable("message").isEmpty());
+    assertTrue(iteration.variableByName("nickname").isEmpty());
+    assertTrue(iteration.variableByName("amount").isEmpty());
+    assertTrue(iteration.variableByName("currency").isEmpty());
+    assertTrue(iteration.variableByName("message").isEmpty());
   }
 
   @Test
@@ -269,8 +269,8 @@ public class DonationTriggerTest {
     trigger.extractVariables(event, iteration);
 
     // Assert
-    assertEquals("50", iteration.variable("amount").get().value());
-    assertTrue(iteration.variable("currency").isEmpty());
+    assertEquals("50", iteration.variableByName("amount").get().value());
+    assertTrue(iteration.variableByName("currency").isEmpty());
   }
 
   @Test
@@ -283,9 +283,9 @@ public class DonationTriggerTest {
     trigger.extractVariables(new Object(), iteration);
 
     // Assert
-    assertTrue(iteration.variable("nickname").isEmpty());
-    assertTrue(iteration.variable("amount").isEmpty());
-    assertTrue(iteration.variable("currency").isEmpty());
-    assertTrue(iteration.variable("message").isEmpty());
+    assertTrue(iteration.variableByName("nickname").isEmpty());
+    assertTrue(iteration.variableByName("amount").isEmpty());
+    assertTrue(iteration.variableByName("currency").isEmpty());
+    assertTrue(iteration.variableByName("message").isEmpty());
   }
 }

@@ -192,9 +192,9 @@ public class CommandTriggerTest {
       new TriggerRuleCommand("rule-id", "nickname", "system", Map.of("var1", "val1")),
       iteration
     );
-    assertEquals("nickname", iteration.variable("nickname").get().value());
-    assertEquals("system", iteration.variable("system").get().value());
-    assertEquals("val1", iteration.variable("var1").get().value());
+    assertEquals("nickname", iteration.variableByName("nickname").get().value());
+    assertEquals("system", iteration.variableByName("system").get().value());
+    assertEquals("val1", iteration.variableByName("var1").get().value());
   }
 
   @Test
@@ -213,8 +213,8 @@ public class CommandTriggerTest {
       new TriggerRuleCommand("rule-id", null, null, null),
       iteration
     );
-    assertTrue(iteration.variable("nickname").isEmpty());
-    assertTrue(iteration.variable("system").isEmpty());
+    assertTrue(iteration.variableByName("nickname").isEmpty());
+    assertTrue(iteration.variableByName("system").isEmpty());
   }
 }
 

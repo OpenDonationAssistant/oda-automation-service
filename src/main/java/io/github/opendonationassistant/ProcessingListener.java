@@ -1,5 +1,6 @@
 package io.github.opendonationassistant;
 
+import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.domain.IterationFactory;
 import io.github.opendonationassistant.automation.listener.messagehandlers.twitch.TwitchChannelRaidEventHandler.TwitchChannelRaidEvent;
 import io.github.opendonationassistant.commons.logging.ODALogger;
@@ -26,7 +27,15 @@ public class ProcessingListener {
     new io.github.opendonationassistant.rabbit.Queue(QUEUE_NAME);
   public static final List<Exchange> BINDING = List.of(
     Exchange.Exchange("twitch", Map.of("event.*", QUEUE)),
-    Exchange.Exchange("history", Map.of("event.HistoryItemEvent", QUEUE))
+    Exchange.Exchange("history", Map.of("event.HistoryItemEvent", QUEUE)),
+    Exchange.Exchange(
+      "automation",
+      Map.of(
+        "event.VariableCreated", QUEUE,
+        "event.VariableUpdated", QUEUE,
+        "event.VariableDeleted", QUEUE
+      )
+    )
   );
 
   private ODALogger log = new ODALogger(this);
@@ -90,6 +99,18 @@ public class ProcessingListener {
       case "HistoryItemEvent":
         return Optional.ofNullable(
           mapper.readValue(message, HistoryItemEvent.class)
+        );
+      case "VariableCreated":
+        return Optional.ofNullable(
+          mapper.readValue(message, AutomationVariable.VariableCreated.class)
+        );
+      case "VariableUpdated":
+        return Optional.ofNullable(
+          mapper.readValue(message, AutomationVariable.VariableUpdated.class)
+        );
+      case "VariableDeleted":
+        return Optional.ofNullable(
+          mapper.readValue(message, AutomationVariable.VariableDeleted.class)
         );
     }
     log.debug("Can't convert step", Map.of("type", type));

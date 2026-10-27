@@ -6,12 +6,13 @@ import io.github.opendonationassistant.automation.domain.variable.AutomationStri
 import io.github.opendonationassistant.automation.repository.AutomationActionData;
 import io.github.opendonationassistant.automation.repository.AutomationVariableRepository;
 import java.math.BigDecimal;
+import java.util.Optional;
 
-public class ResetVariableAction extends AbstractVariableAction {
+public class SetVariableValueAction extends AbstractVariableAction {
 
-  public static final String ID = "reset-variable";
+  public static final String ID = "set-variable-value";
 
-  public ResetVariableAction(
+  public SetVariableValueAction(
     AutomationActionData data,
     String recipientId,
     AutomationVariableRepository variables
@@ -19,13 +20,26 @@ public class ResetVariableAction extends AbstractVariableAction {
     super(data, recipientId, variables);
   }
 
+  public Optional<String> getValue() {
+    return Optional.ofNullable(data().value().get("value")).map(String::valueOf);
+  }
+
   @Override
   public void execute(Iteration iteration) {
+    var raw = getValue();
+    if (raw.isEmpty()) {
+      return;
+    }
+    var value = raw.get();
     variable().ifPresent(variable -> {
       if (variable instanceof AutomationNumberVariable number) {
-        number.setValue(BigDecimal.ZERO);
+        try {
+          number.setValue(new BigDecimal(value.trim()));
+        } catch (NumberFormatException ignored) {
+          // invalid numeric payload — leave the variable unchanged
+        }
       } else if (variable instanceof AutomationStringVariable string) {
-        string.update(string.name(), "");
+        string.update(string.name(), value);
       }
     });
   }

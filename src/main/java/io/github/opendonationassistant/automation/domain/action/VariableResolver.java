@@ -43,6 +43,6 @@ public final class VariableResolver {
   }
 
   public static String resolve(String template, Iteration iteration) {
-    return resolve(template, iteration::variable);
+    return resolve(template, iteration::variableByName);
   }
 }

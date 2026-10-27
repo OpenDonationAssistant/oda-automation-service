@@ -3,6 +3,7 @@ package io.github.opendonationassistant;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.domain.Iteration;
 import io.github.opendonationassistant.automation.domain.IterationFactory;
 import io.github.opendonationassistant.automation.listener.messagehandlers.twitch.TwitchChannelRaidEventHandler;
@@ -98,6 +99,78 @@ public class ProcessingListenerTest {
     assertEquals("recipient-1", dispatched.recipientId());
     assertEquals("nickname", dispatched.nickname());
     assertEquals("hello", dispatched.message());
+    verify(iteration).run();
+    verify(ack).ack();
+  }
+
+  @Test
+  public void testConvertsAndDispatchesVariableCreatedEvent() throws IOException {
+    // Objective: a VariableCreated payload is deserialized, dispatched to the
+    // iteration engine with its recipientId, and acked.
+    var event = new AutomationVariable.VariableCreated(
+      "variable-1",
+      "recipient-1",
+      "greeting",
+      "string",
+      "hello"
+    );
+    doReturn(iteration).when(iterationFactory).create(any(), any());
+
+    new ProcessingListener(iterationFactory, mapper).processStep(
+      "VariableCreated",
+      mapper.writeValueAsBytes(event),
+      ack
+    );
+
+    verify(iterationFactory).create(event.recipientId(), event);
+    verify(iteration).run();
+    verify(ack).ack();
+  }
+
+  @Test
+  public void testConvertsAndDispatchesVariableUpdatedEvent() throws IOException {
+    // Objective: a VariableUpdated payload is deserialized, dispatched to the
+    // iteration engine with its recipientId, and acked.
+    var event = new AutomationVariable.VariableUpdated(
+      "variable-1",
+      "recipient-1",
+      "greeting",
+      "string",
+      "hello"
+    );
+    doReturn(iteration).when(iterationFactory).create(any(), any());
+
+    new ProcessingListener(iterationFactory, mapper).processStep(
+      "VariableUpdated",
+      mapper.writeValueAsBytes(event),
+      ack
+    );
+
+    verify(iterationFactory).create(event.recipientId(), event);
+    verify(iteration).run();
+    verify(ack).ack();
+  }
+
+  @Test
+  public void testConvertsAndDispatchesVariableDeletedEvent() throws IOException {
+    // Objective: a VariableDeleted payload is deserialized, dispatched to the
+    // iteration engine with its recipientId, and acked.
+    var event = new AutomationVariable.VariableDeleted(
+      "variable-1",
+      "recipient-1",
+      "greeting",
+      "string",
+      "hello"
+    );
+    doReturn(iteration).when(iterationFactory).create(any(), any());
+
+    new ProcessingListener(iterationFactory, mapper).processStep(
+      "VariableDeleted",
+      mapper.writeValueAsBytes(event),
+      ack
+    );
+
+    verify(iterationFactory).create(event.recipientId(), event);
     verify(iteration).run();
     verify(ack).ack();
   }

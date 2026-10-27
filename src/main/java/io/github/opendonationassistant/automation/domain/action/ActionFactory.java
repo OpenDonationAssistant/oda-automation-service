@@ -50,7 +50,7 @@ public class ActionFactory {
         recipientId,
         variables
       );
-      case ResetVariableAction.ID -> new ResetVariableAction(
+      case SetVariableValueAction.ID -> new SetVariableValueAction(
         data,
         recipientId,
         variables

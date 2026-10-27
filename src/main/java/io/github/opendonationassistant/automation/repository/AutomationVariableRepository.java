@@ -5,10 +5,12 @@ import io.github.opendonationassistant.automation.AutomationVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationNumberVariable;
 import io.github.opendonationassistant.automation.domain.variable.AutomationStringVariable;
 import io.github.opendonationassistant.commons.logging.ODALogger;
+import io.github.opendonationassistant.rabbit.RabbitClient;
 import io.micronaut.data.model.Page;
 import io.micronaut.data.model.Pageable;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,15 @@ public class AutomationVariableRepository {
 
   private final ODALogger log = new ODALogger(this);
   private AutomationVariableDataRepository repository;
+  private final RabbitClient rabbit;
 
   @Inject
   public AutomationVariableRepository(
-    AutomationVariableDataRepository repository
+    AutomationVariableDataRepository repository,
+    @Named("automation") RabbitClient rabbit
   ) {
     this.repository = repository;
+    this.rabbit = rabbit;
   }
 
   public List<AutomationVariable<?>> listByRecipientId(String recipientId) {
@@ -50,7 +55,9 @@ public class AutomationVariableRepository {
     String recipientId,
     Pageable pageable
   ) {
-    return repository.findByRecipientId(recipientId, pageable).map(this::convert);
+    return repository
+      .findByRecipientId(recipientId, pageable)
+      .map(this::convert);
   }
 
   public Optional<AutomationVariable<?>> getById(
@@ -77,7 +84,6 @@ public class AutomationVariableRepository {
       recipientId,
       Optional.ofNullable(variableValue).orElse("")
     );
-    repository.save(data);
     final AutomationVariable<?> created = convert(data);
     log.debug("Created variable", Map.of("variable", created));
     return created;
@@ -85,9 +91,9 @@ public class AutomationVariableRepository {
 
   private AutomationVariable<?> convert(AutomationVariableData it) {
     return switch (it.type()) {
-      case "number" -> new AutomationNumberVariable(it, repository);
-      case "string" -> new AutomationStringVariable(it, repository);
-      default -> new AutomationVariable<String>(it, repository);
+      case "number" -> new AutomationNumberVariable(it, repository, rabbit);
+      case "string" -> new AutomationStringVariable(it, repository, rabbit);
+      default -> new AutomationVariable<String>(it, repository, rabbit);
     };
   }
 }

@@ -106,54 +106,55 @@ public class SetState extends BaseController implements SetStateApi {
           .isEmpty()
       )
       .forEach(valueToCreate ->
-        variables.create(
-          recipientId,
-          valueToCreate.type(),
-          valueToCreate.id(),
-          valueToCreate.name(),
-          valueToCreate.value()
-        )
+        variables
+          .create(
+            recipientId,
+            valueToCreate.type(),
+            valueToCreate.id(),
+            valueToCreate.name(),
+            valueToCreate.value()
+          )
+          .save()
       );
   }
 
   private void updateRules(String recipientId, SetStateCommand command) {
-    final List<AutomationRule> existingRules = rules.listByRecipientId(
-      recipientId
-    ).toList();
-    existingRules
-      .forEach(existing -> {
-        final Optional<AutomationRuleDto> updatedRule = command
-          .rules()
-          .stream()
-          .filter(it -> it.id().equals(existing.data().id()))
-          .findAny();
-        updatedRule.ifPresentOrElse(
-          updated ->
-            existing.update(
-              new AutomationRuleData(
-                updated.id(),
-                updated.name(),
-                recipientId,
-                updated
-                  .triggers()
-                  .stream()
-                  .map(trigger ->
-                    new AutomationTriggerData(trigger.id(), trigger.value())
-                  )
-                  .toList(),
-                updated
-                  .actions()
-                  .stream()
-                  .map(action ->
-                    new AutomationActionData(action.id(), action.value())
-                  )
-                  .toList(),
-                existing.data().enabled()
-              )
-            ),
-          () -> existing.delete()
-        );
-      });
+    final List<AutomationRule> existingRules = rules
+      .listByRecipientId(recipientId)
+      .toList();
+    existingRules.forEach(existing -> {
+      final Optional<AutomationRuleDto> updatedRule = command
+        .rules()
+        .stream()
+        .filter(it -> it.id().equals(existing.data().id()))
+        .findAny();
+      updatedRule.ifPresentOrElse(
+        updated ->
+          existing.update(
+            new AutomationRuleData(
+              updated.id(),
+              updated.name(),
+              recipientId,
+              updated
+                .triggers()
+                .stream()
+                .map(trigger ->
+                  new AutomationTriggerData(trigger.id(), trigger.value())
+                )
+                .toList(),
+              updated
+                .actions()
+                .stream()
+                .map(action ->
+                  new AutomationActionData(action.id(), action.value())
+                )
+                .toList(),
+              existing.data().enabled()
+            )
+          ),
+        () -> existing.delete()
+      );
+    });
 
     command
       .rules()
