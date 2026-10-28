@@ -19,7 +19,7 @@ public class RateLimiter {
     synchronized (list) {
       Instant cutoff = timestamp.minusSeconds(60);
       list.removeIf(t -> t.isBefore(cutoff));
-      if (list.size() < 100) {
+      if (list.size() < 10) {
         list.add(timestamp);
         return true;
       }

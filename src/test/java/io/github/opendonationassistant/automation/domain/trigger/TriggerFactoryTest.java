@@ -51,6 +51,14 @@ public class TriggerFactoryTest {
   }
 
   @Test
+  public void testCreatesVariableValueChangedTriggerFromStoredData() {
+    assertCreatedFromStoredData(
+      "variable-value-changed",
+      VariableValueChangedTrigger.class
+    );
+  }
+
+  @Test
   public void testFallsBackToNeverTriggerForUnknownIdFromStoredData() {
     assertCreatedFromStoredData(
       "unknown-trigger",
@@ -76,6 +84,14 @@ public class TriggerFactoryTest {
     assertCreatedFromCommand(
       "variable-equals-value",
       VariableEqualsValueTrigger.class
+    );
+  }
+
+  @Test
+  public void testCreatesVariableValueChangedTriggerFromCommand() {
+    assertCreatedFromCommand(
+      "variable-value-changed",
+      VariableValueChangedTrigger.class
     );
   }
 

@@ -20,6 +20,9 @@ public class TriggerFactory {
       case "variable-equals-value" -> new VariableEqualsValueTrigger(
         new AutomationTriggerData(id, value)
       );
+      case "variable-value-changed" -> new VariableValueChangedTrigger(
+        new AutomationTriggerData(id, value)
+      );
       default -> new NeverTrigger(new AutomationTriggerData(id, value));
     };
   }
@@ -32,6 +35,7 @@ public class TriggerFactory {
       case "command" -> new CommandTrigger(data);
       case "donation" -> new DonationTrigger(data);
       case "variable-equals-value" -> new VariableEqualsValueTrigger(data);
+      case "variable-value-changed" -> new VariableValueChangedTrigger(data);
       default -> new NeverTrigger(data);
     };
   }

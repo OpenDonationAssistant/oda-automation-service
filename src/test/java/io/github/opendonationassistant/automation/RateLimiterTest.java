@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class RateLimiterTest {
 
   private static final String RECIPIENT = "test-recipient";
-  private static final int LIMIT = 100;
+  private static final int LIMIT = 10;
 
   private RateLimiter limiter = new RateLimiter();
   private Instant now = Instant.parse("2026-01-01T00:00:00Z");
